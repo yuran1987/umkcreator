@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+<style>
+    #umk_core_content {
+        padding-top: 100px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div id="umk_core_content">
+        <div id="panel">
+            <p>Авторами являются сотрудники кафедры <a href="https://www.tyuiu.ru/branches/surgut/kafedry/kafedra-ekspluatatsii-transportnyh-i-tehnologicheskih-mashin-ettm/">ЭТТМ</a> филиала ТИУ в г.Сургуте:</p>
+            <ul>
+                <li><a href="mailto:shtanovjn@tyuiu.ru">Штанов Юрий Николаевич</a></li>
+                <li><a href="mailto:ziganshinra@tyuiu.ru">Зиганшин Руслан Альбертович</a></li>
+            </ul>
+            <p>Также в разработке принимали участие:</p>
+            <ul>
+                <li>разработка модуля импорта компетенций: <a href="mailto:mister-fokin@yandex.ru">Фокин Александр Сергеевич</a> </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+

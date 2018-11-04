@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+<style>
+    #umk_core_content {
+        padding-top: 100px;
+    }
+    #panel {
+        height: 100px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div id="umk_core_content">
+        {% if user.is_authenticated %}
+            <div id="panel">
+                <div class="col-sm-12">
+                    <div class="page-header">
+                        <center>
+                        <h4>{{ discipline }} <<{{ direction }}>></h4>
+                        <h5>{{ profiles }}:</h5>
+                        </center>
+                    </div>
+                </div>
+            </div>
+            <div id="list_actionstable">
+                <ol>
+                 <li><a href="{% url 'showumklist' %}">Назад</a></li>
+                 <li><a href="{% url 'umk_edit_core' umk_id %}">Основное</a></li>
+                 {% if actions_list %}
+                    {% for act in actions_list %}
+                        <li><a href="{{ act.url }}">{{ act.name }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    <li>Извините, но действий для лабораторных, семинарских, и практических работ отсутствуют.</li>
+                {% endif %}
+                <li><a href="{% url 'showrating' umk_id %}">Рейтинговая система оценки</a></li>
+                <li><a href="{% url 'showliter' umk_id %}">Литература</a></li>
+                </ol>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

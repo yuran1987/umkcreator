@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+<style>
+    #content {
+        padding-top: 150px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div id="content">
+        <div id="panel">
+            <h1>Профиль</h1>
+            <p>{% if object.username == user.username %}<a href="{% url 'edit_profile' %}">Изменить</a>{% endif %}</p>
+            <p>Имя пользователя: {{ user }}</p>
+            <p>Фамилия: {{ user.first_name }}</p>
+            <p>Имя: {{ user.last_name }}</p>
+            <p>Отчество: {{ user.patronymic }}</p>
+            <p>Email: {{ user.email }}</p>
+            <p>Дата рождения: {{ user.birthday }}</p>
+            <p>Кафедра: {{ user.deparmt }}</p>
+            <p>Должность: {{ user.get_position_display }}</p>
+            <p>Ученая степень: {{ user.get_science_stepen_display }}</p>
+            <p>Ученое звание: {{ user.get_science_zvanie_display }}</p>
+        </div>
+    </div>
+{% endblock %}

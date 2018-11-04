@@ -1,0 +1,152 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+    <link rel="stylesheet" href="{%  static 'css/lobibox.min.css' %}"/>
+    <script src="{%  static 'js/jquery.1.11.min.js' %}"></script>
+    <script src="{%  static 'js/lobibox.min.js' %}"></script>
+    <script src="{%  static 'js/notifications.min.js' %}"></script>
+    <style>
+        #tablelist {
+            width: 860px;
+            border-collapse: collapse;
+            border: 1px solid;
+            cellpadding: 4;
+            cellspacing: 0;
+        }
+        #tablelist th{
+            text-align: center;
+            border: 1px solid;
+        }
+
+        #inlinetablelist{
+            overflow-y: scroll;
+            height: 700px;
+            width: 100%;
+            position: absolute;
+        }
+
+        #inlinetablelist tr th{
+            border: 1px solid;
+        }
+
+        #btn_export:focus {
+            outline: none !important
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header">
+                <center>
+                <h1>Ваши рабочие программы:</h1>
+                </center>
+            </div>
+        </div>
+    </div>
+    <div id="list_umktable">
+        <table id="tablelist" class="table table-bordered table-sm">
+            {% if umk_list %}
+                <tbody id="inlinetablelist">
+                <tr>
+                <th>№</th>
+                <th>Направление, квалификация</th>
+                <th>Название</th>
+                <th>Дата создания</th>
+                <th>Дата изменения</th>
+                <th>Статус</th>
+                <th>Действие</th>
+               </tr>
+                {% for umk in umk_list %}
+                    <tr>
+                    <th><input type="checkbox" value="{{ umk.id }}" title="id: {{ umk.id }}"></th>
+                    <th>{{ umk.type }}</th>
+                    <th><a href="#">{{ umk.name }}</a></th>
+                    <th>{{ umk.datetime_create }}</th>
+                    <th>{{ umk.datetime_changed }}</th>
+                    <th>{{ umk.status }}</th>
+                    {% if umk.status_raw == "signaturing" or umk.status_raw == "confirmed" %}
+                        <th>Нет действий</th>
+                    {% else %}
+                        <th><a href="/umk/edit/{{ umk.id }}/">Изменить</a></th>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td><button type="button" class="btn btn-success" id="btn_export">Экспорт</button></td>
+                    <td><button type="button" class="btn btn-primary" id="btn_send2sign" title="Данным действием Вы отправите рабочую(-ие) программу(-мы) на подпись зав.кафедрой">На подпись</button></td>
+                    <td><button type="button" class="btn btn-danger" id="btn_delete">Удалить</button></td>
+                </tr>
+                </tbody>
+            {% else %}
+                <tr>Извините, но Вы не создали ни одну рабочую программу</tr>
+            {% endif %}
+         </table>
+
+    </div>
+    {% endif %}
+
+
+{% endblock %}
+
+{% block scripts_block %}
+    <script>
+        $('#btn_delete').click(function(){
+                var list = [];
+                $('input:checkbox:checked').each(function(){
+                    var d  = parseInt($(this).val());
+                    if(isNaN(d)==false) list.push(d);
+                });
+                Lobibox.confirm({
+                    msg: "Вы согласны удалить данную рабочую программу?",
+                    callback: function ($this, type) {
+                        if (type === 'yes') {
+                            Lobibox.notify('success', {
+                                msg: 'Удаляем рабочую программу!'
+                            });
+                            //удаляем
+                            for(var i=0; i<list.length; i++)
+                            {
+                                $.getJSON('remove/' + list[i] + "/", function(data) {//отправка запроса
+                                    console.log("success status:" + data['status'] );
+                                })
+                                .fail(function() {
+                                  alert('Ошибка: Не удалось получить данные или ошибка URL!');
+                                });
+                            }
+                            setInterval(function() { //Переадресация по новому URL
+                              window.location.href = "{% url 'showumklist'  %}";
+                            }, 5000); // milliseconds to wait
+                        } else if (type === 'no') {
+                            Lobibox.notify('info', {
+                                msg: 'Вы отменили удаление рабочей программы'
+                            });
+                        }
+                    }
+                });
+        });
+
+        $('#btn_export').click(function(){
+            var req = [];
+                var count = $(':checkbox:checked').length;
+                $('input:checkbox:checked').each(function(){
+                    var d  = parseInt($(this).val());
+                    if(isNaN(d)==false) req.push(d);
+                });
+            console.log(req.join("+"));
+            window.location.href = "/umk/get/"+req.join("+")+"/docx/";
+        });
+
+        $('#btn_send2sign').click(function(){
+            var req = [];
+            var count = $(':checkbox:checked').length;
+            $('input:checkbox:checked').each(function(){
+                var d  = parseInt($(this).val());
+                if(isNaN(d)==false) req.push(d);
+            });
+            window.location.href = "/umk/send2sign/"+req.join("+")+"/";
+        });
+    </script>
+{% endblock %}

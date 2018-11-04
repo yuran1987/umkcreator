@@ -1,0 +1,166 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+
+{% block header_settings %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/js/jquery.jexcel.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/css/jquery.jexcel.min.css" type="text/css" />
+
+<script type="text/javascript" src="{% static 'js/jquery.powertip.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.powertip.css' %}"/>
+<style>
+    #tablejexcel {
+        overflow-y: scroll;
+        height: 300px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+    <div id="umk_core_content">
+        <center><h3>{{ title_form }}</h3></center>
+        <div id="panel">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <strong>{{ error|escape }}</strong><br />
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+             {% for error in form.non_field_errors %}
+                 <div class="alert alert-danger">
+                     <strong>{{ error|escape }}</strong>
+                 </div>
+             {% endfor %}
+            {% endif %}
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_block %}
+    <script>
+        var num_row_total = 1;
+        var num_total_for_table = "0/0/0";
+        var methods_teacher_prakt_labs = {{ meth_tech_pr_labs|safe }};
+        //-------------------------------ЗАГРУЗКА----------------------------------------------------------
+        $.when( $.ready ).then(function() {
+            data = $('#id_data_field').val();
+            if(data.length>0) {
+                if(JSON.parse(data).length>1) {
+                    num_row_total = JSON.parse(data).length - 1;
+                    $('#tablejexcel').jexcel('setData', data); // Перечень тем занятий
+                }
+            }
+        });
+        //-------------------------------СОХРАНЕНИЕ----------------------------------------------------------
+        $('#btn_save').on('click', function () {
+            data = $('#tablejexcel').jexcel('getData');//------ Перечень тем  занятий
+            if(data.length>0) $('#id_data_field').val(JSON.stringify(data));
+        });
+
+        /*----------------------------------------------------------------------------------------------------------*/
+        $(function() {
+			$('#tablejexcel').data('powertipjq', $('<p>{{ table_hour_tooltip }}</p>'));
+			$('#tablejexcel').powerTip({placement: 'e',mouseOnToPopup: true});
+		});
+
+        function arrText2Num(arr) {
+            var result = new Array(arr.length);
+            var index;
+            for (index = 0; index < arr.length; ++index) {
+                  result[index] = parseFloat(arr[index].replace(/,/, '.'));
+            }
+            return result;
+        }
+
+        function insertrow_labs(obj) {
+            var num_p_p = parseInt($(obj).jexcel('getValue', 'A' + num_row_total.toString()));
+            var idCell = 'C' + (num_row_total + 1).toString();
+            var text_total = $(obj).jexcel('getValue', idCell);
+            $(obj).jexcel('setValue', idCell, '');
+            num_row_total += 1;
+            idCell = 'C' + (num_row_total + 1).toString();
+            $(obj).jexcel('setValue', idCell, text_total);
+            //--------------------------------------------------
+            num_p_p += 1;
+            $(obj).jexcel('setValue', 'A' + num_row_total.toString(), num_p_p);
+        }
+
+        function deleterow_labs(obj) {
+            num_row_total -= 1;
+        }
+
+
+        $('#tablejexcel').jexcel({
+            data: [
+                ['1','','','','',''],
+                ['','','Итого:','','',''],
+            ],
+            colHeaders: ['№ п/п',           '№ темы',                  'Темы {{ table_header }} работ',
+                         'Трудоемкость (час.)', 'Формируемые компетенции', 'Методы преподавания'],
+            colWidths: [ 100, 70, 200, 150, 250, 200],
+            oninsertrow: insertrow_labs,
+            ondeleterow: deleterow_labs,
+            allowInsertColumn:false,
+            columns: [
+                      { type: 'numeric' },
+                      { type: 'text' },
+                      { type: 'text',wordWrap:true},
+                      { type: 'text' },
+                      { type: 'text' },
+                      { type: 'autocomplete', source: methods_teacher_prakt_labs },
+                     ]
+        });
+
+        $('#tablejexcel').jexcel('updateSettings', {
+            cells: function (cell, col, row) {
+                if(col==3) {
+                    if (row == num_row_total) {
+                            $(cell).addClass('readonly');
+                             var tmp = arrText2Num(num_total_for_table.split('/'));
+                             $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                        } else {
+                            $(cell).removeClass('readonly');
+                            if (row == 0) {
+                                num_total_for_table = "0/0/0";
+                            }
+
+                            var tmp = arrText2Num($(cell).text().split('/'));
+                            var curr = arrText2Num(num_total_for_table.split('/'));
+
+                            var index;
+                            for (index = 0; index < tmp.length; ++index) {
+                                curr[index] += tmp[index];
+                            }
+
+                            num_total_for_table = numeral(curr[0]).format('0.0') + '/' + numeral(curr[1]).format('0.0') + '/' + numeral(curr[2]).format('0.0');
+                        }
+                }
+            }
+        });
+
+        $('#button_fill_hour').on('click', function () {
+              var hours = arrText2Num("{{ hours_for_calc|safe }}".split('/'));
+              var competence = '{{ competences|safe }}';
+              hour_curr = [ hours[0]/num_row_total , hours[1]/num_row_total, hours[2]/num_row_total ];
+
+              for(var i=1; i<=num_row_total; i++)
+              {
+                  $('#tablejexcel').jexcel('setValue', 'D'+i, numeral(hour_curr[0]).format('0.0') + '/' + numeral(hour_curr[1]).format('0.0') + '/' + numeral(hour_curr[2]).format('0.0'));
+                  $('#tablejexcel').jexcel('setValue', 'E'+i, competence)
+              }
+        });
+
+        $('#button_to_csv').on('click', function () {
+            var data = $('#tablejexcel').jexcel('getData');
+            window.location.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent($.csv.fromArrays(data));
+       });
+    </script>
+{% endblock %}

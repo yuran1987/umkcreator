@@ -1,0 +1,123 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+    <link rel="stylesheet" href="{%  static 'css/lobibox.min.css' %}"/>
+    <script src="{%  static 'js/jquery.1.11.min.js' %}"></script>
+    <script src="{%  static 'js/lobibox.min.js' %}"></script>
+    <script src="{%  static 'js/notifications.min.js' %}"></script>
+    <style>
+        #tablelist {
+            border-collapse: collapse;
+            border: 1px solid;
+            cellpadding: 4;
+            cellspacing: 0;
+            width: 1080px;
+        }
+        #tablelist td{
+            text-align: center;
+            border: 1px solid;
+        }
+
+        #inlinetablelist{
+            overflow-y: scroll;
+            height: 600px;
+            width: 100%;
+            position: absolute;
+        }
+
+        #inlinetablelist tr th{
+            border: 1px solid;
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <center>
+                    <h1>Учебные планы:</h1>
+                    </center>
+                </div>
+            </div>
+        </div>
+        <div id="list_umktable">
+            <table id="tablelist" class="table">
+                {% if plan_list%}
+                    <tbody id="inlinetablelist">
+                    <tr>
+                    <th>Дисциплина</th>
+                    <th>Название</th>
+                    <th>Профили</th>
+                    <th>Форма обучения</th>
+                    <th>Квалификация и программа обучения</th>
+                    <th>Действие</th>
+                   </tr>
+                    {% for plan in plan_list %}
+                        <tr>
+                        <td>{{ plan.disp }}</td>
+                        <td>{{ plan.name }}</td>
+                        <td>{{ plan.prof }}</td>
+                        <td>{{ plan.type_edu }}</td>
+                        <td>{{ plan.kva }}</td>
+                        <td><a href="#" value="{{ plan.id }}" data-role="select">Удалить</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% else %}
+                    <tr>Извините, но Вы не загрузили ни один учебный план!</tr>
+                {% endif %}
+            </table>
+        </div>
+        {% else %}
+
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block scripts_block %}
+    <script>
+        $.fn.serializeObject = function () {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+        $(function () {
+            (function () {
+                $('a[data-role=select]').click(function () {
+                    var get_id = $(this).attr('value')
+                    Lobibox.confirm({
+                        msg: "Вы согласны удалить данную учебный план?",
+                        callback: function ($this, type) {
+                            if (type === 'yes') {
+                                Lobibox.notify('success', {
+                                    msg: 'Удаляем план...'
+                                });
+                                setInterval(function() { //Переадресация по новому URL
+                                  window.location.href = "/plan/remove/" + get_id + "/";
+                                }, 5000); // milliseconds to wait
+                            } else if (type === 'no') {
+                                Lobibox.notify('info', {
+                                    msg: 'Вы отменили удаление плана!'
+                                });
+                            }
+                        }
+                    });
+                });
+            })();
+        });
+    </script>
+{% endblock %}

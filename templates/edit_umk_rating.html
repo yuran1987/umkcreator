@@ -1,0 +1,104 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+
+{% block header_settings %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.3/jquery.mask.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.7/js/jquery.jexcel.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.7/css/jquery.jexcel.min.css" type="text/css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+    <script src="http://cdn.bossanova.uk/js/excel-formula.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.powertip.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.powertip.css' %}"/>
+<style>
+    #panel {
+        height: 100px;
+        width: 100%;
+        position: center;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+    <div id="umk_content_rating">
+        <div id="panel">
+            <div class="page-header">
+                <h3>{{ title_form }}</h3>
+            </div>
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <strong>{{ error|escape }}</strong><br />
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+             {% for error in form.non_field_errors %}
+                 <div class="alert alert-danger">
+                     <strong>{{ error|escape }}</strong>
+                 </div>
+             {% endfor %}
+            {% endif %}
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_block %}
+    <script>
+        //-------------------------------ЗАГРУЗКА----------------------------------------------------------
+        $.when( $.ready ).then(function() {
+            $('#tablejexcel_ochka').jexcel('setData', $('#id_rating_ochka').val());
+            $('#tablejexcel_zaochka').jexcel('setData', $('#id_rating_zaochka').val());
+        });
+        //-------------------------------СОХРАНЕНИЕ----------------------------------------------------------
+        $('#btn_save').on('click', function () {
+            data_ochka = $('#tablejexcel_ochka').jexcel('getData');
+            data_zaochka = $('#tablejexcel_zaochka').jexcel('getData');
+            if(data_ochka.length>0) $('#id_rating_ochka').val(JSON.stringify(data_ochka));
+            if(data_zaochka.length>0) $('#id_rating_zaochka').val(JSON.stringify(data_zaochka));
+        });
+
+        /*----------------------------------------------------------------------------------------------------------*/
+        $('#tablejexcel_ochka').jexcel({
+            data: [
+                ['1','','',''],
+                ['2','Итого:','',''],
+            ],
+            colHeaders: ['№', 'Виды контрольных мероприятий', 'Баллы', '№ недели'],
+            colWidths: [ 100, 300, 150, 150],
+            allowInsertColumn:false,
+            columns: [
+                      { type: 'numeric' },
+                      { type: 'autocomplete', source: {{ type_control_rating_ochka|safe }} },
+                      { type: 'text' },
+                      { type: 'text' },
+                     ]
+        });
+
+        $('#tablejexcel_zaochka').jexcel({
+            data: [
+                ['1','',''],
+                ['2','Итого:',''],
+            ],
+            colHeaders: ['№', 'Виды контрольных мероприятий', 'Баллы'],
+            colWidths: [ 100, 300, 150],
+            allowInsertColumn:false,
+            columns: [
+                      { type: 'numeric' },
+                      { type: 'autocomplete', source: {{ type_control_rating_zaochka|safe }} },
+                      { type: 'text' }
+                     ]
+        });
+
+        $('#tablejexcel_ochka').data('powertipjq', $('<p>Количество недель в семестре: {{ weeks_count|safe }}</p>'));
+		$('#tablejexcel_ochka').powerTip({placement: 'e',mouseOnToPopup: true});
+
+
+
+    </script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-tab.js' %}">  </script>
+{% endblock %}

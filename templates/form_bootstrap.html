@@ -1,0 +1,42 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+        <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}"/>
+        <link rel="stylesheet" href="{% static "css/bootstrap-datetimepicker.min.css" %}"/>
+
+        <script src="{% static "js/jquery-3.2.1.min.js" %}"></script>
+        <script src="{% static "js/moment-with-locales.min.js" %}"></script>
+        <script src="{% static "js/bootstrap.min.js" %}"></script>
+        <script src="{% static "js/bootstrap-datetimepicker.min.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="row" id="form_style">
+        <div>
+            <div class="page-header">
+                <h3>{{ title_form }}</h3>
+            </div>
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <strong>{{ error|escape }}</strong><br />
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+             {% for error in form.non_field_errors %}
+                 <div class="alert alert-danger">
+                     <strong>{{ error|escape }}</strong>
+                 </div>
+             {% endfor %}
+            {% endif %}
+            {% crispy form %}
+            <script type="text/javascript">
+            $(function () {
+                $('#datetimepicker').datetimepicker({locale: 'ru',format: 'DD/MM/YYYY'});
+            });
+            </script>
+        </div>
+    </div>
+{% endblock %}

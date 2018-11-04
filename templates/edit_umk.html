@@ -1,0 +1,153 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+
+{% block header_settings %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.3/jquery.mask.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/js/jquery.jexcel.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/css/jquery.jexcel.min.css" type="text/css" />
+
+<script type="text/javascript" src="{% static 'js/jquery.powertip.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/jquery.powertip.css' %}"/>
+<style>
+    #umk_core_content{
+        padding-top: 600px;
+    }
+    #tabslist {
+        overflow-y: scroll;
+        height: 600px;
+        width: 100%;
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+    <div id="umk_core_content">
+        <center><h3>{{ title_form }}</h3></center>
+        <div id="panel">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <strong>{{ error|escape }}</strong><br />
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+             {% for error in form.non_field_errors %}
+                 <div class="alert alert-danger">
+                     <strong>{{ error|escape }}</strong>
+                 </div>
+             {% endfor %}
+            {% endif %}
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_block %}
+    <script>
+        //-------------------------------ЗАГРУЗКА----------------------------------------------------------
+        $.when( $.ready ).then(function() {
+            var data = $('#id_contentOfSections').val();
+            $('#tablecontentOfSections').jexcel('setData',data); //загрузка 4.1 наименований разделов дисциплины
+
+            data = $('#id_interdiscipRelations').val();
+            $('#tableinterdiscipRelations').jexcel('setData',data); //загрузка 4.2 последующих дисциплин
+
+            data = $('#id_table_sections_hour').val();
+            if(data.length>0) {
+                num_row_total_sec = JSON.parse(data).length - 1;
+                $('#tablesectionshour').jexcel('setData', data); // 4.3 Разделы (модули), темы дисциплин ви виды занятий
+            }
+
+            data = $('#id_table_lectures_hour').val();
+            if(data.length>0) {
+                num_row_total_lec = JSON.parse(data).length - 1;
+                $('#tablelectureshour').jexcel('setData', data); // 4.4 Перечень лекционных занятий
+            }
+
+            data = $('#id_table_samost_hour').val();
+            if(data.length>0) {
+                num_row_total_samost = JSON.parse(data).length - 1;
+                $('#tablesamosthour').jexcel('setData', data); // 4.8 Перечень тем самостоятельной работы
+            }
+            run_show_msg();
+        });
+        //-------------------------------СОХРАНЕНИЕ----------------------------------------------------------
+        $('#btn_save_data_umk').on('click', function () {
+            var data = $('#tablecontentOfSections').jexcel('getData');//---4.1 наименований разделов дисциплины---
+            if(data.length>0) $('#id_contentOfSections').val(JSON.stringify(data));
+
+            data = $('#tableinterdiscipRelations').jexcel('getData');//---4.2 Сохранение последующих дисциплин---
+            if(data.length>0) $('#id_interdiscipRelations').val(JSON.stringify(data));
+
+            data = $('#tablesectionshour').jexcel('getData');//------4.3 Разделы (модули), темы дисциплин ви виды занятий
+            if(data.length>0) $('#id_table_sections_hour').val(JSON.stringify(data));
+
+            data = $('#tablelectureshour').jexcel('getData');//------4.4 Перечень лекционных занятий
+            if(data.length>0) $('#id_table_lectures_hour').val(JSON.stringify(data));
+
+            data = $('#tablesamosthour').jexcel('getData');//------4.8 Перечень тем самостоятельной работы
+            if(data.length>0) $('#id_table_samost_hour').val(JSON.stringify(data));
+        });
+
+        /*----------------------------------------------------------------------------------------------------------*/
+        var hours_for_calc = {{ hours_for_calc|safe }};
+        var exam_zachot = "{{ exam_zachot|safe }}".split("/");
+
+        function run_show_msg() {
+			$('#div_id_aim div').data('powertipjq', $('<p>Укажите сюда цель дисциплины</p>'));
+			$('#div_id_aim div').powerTip({placement: 'e',mouseOnToPopup: true});
+
+			$('#div_id_tasks div').data('powertipjq', $('<p>Укажите задачи дисциплины</p>'));
+			$('#div_id_tasks div').powerTip({placement: 'e',mouseOnToPopup: true});
+
+			$('#tablesectionshour').data('powertipjq', $('<p>Лекции'+hours_for_calc[0]
+                +'</p><p>Практ.зан. '+hours_for_calc[1]
+                +'</p><p>Лаб.раб. '+hours_for_calc[2]
+                +'</p><p>Самост.раб. '+hours_for_calc[3]
+                +'</p><p>Всего,час. '+hours_for_calc[4]
+                +'</p><p>Из них в интер.форме '+hours_for_calc[5]+'</p>'));
+			$('#tablesectionshour').powerTip({placement: 'e',mouseOnToPopup: true});
+
+			$('#tablelectureshour').data('powertipjq', $('<p>Лекции '+hours_for_calc[0]+'</p>'));
+			$('#tablelectureshour').powerTip({placement: 'e',mouseOnToPopup: true});
+
+			var zachot_exam_tooltip = ["Оч.ф.обуч.: ","Заоч.ф.обуч.: ","Заоч.-ускорен.ф.обуч.: "];
+            for(var i=0; i<3; i++) {
+                var tmp = exam_zachot[i].split(",");
+                if (parseInt(tmp[0]) > 0) zachot_exam_tooltip[i] += "зачет в " + tmp[0] + " семестре;";
+                if (parseInt(tmp[1]) > 0) zachot_exam_tooltip[i] += "экзамен в " + tmp[1] + " семестре;";
+            }
+
+			$('#tablesamosthour').data('powertipjq', $('<p>Самост.раб.,час. '+hours_for_calc[3]+'</p><p>' +
+                zachot_exam_tooltip[0] + '</p><p>' +
+                zachot_exam_tooltip[1] + '</p><p>' +
+                zachot_exam_tooltip[2] + '</p><p> {{ kontrol_work_tooltip|safe}} </p>' ));
+
+			$('#tablesamosthour').powerTip({placement: 'e',mouseOnToPopup: true});
+
+			$('#div_id_theme_kursovih_rabot div').data('powertipjq', $('{{ KPKR_tooltip|safe }}'));
+			$('#div_id_theme_kursovih_rabot div').powerTip({placement: 'e',mouseOnToPopup: true});
+		}
+
+        var competence = '{{ competences|safe }}'; //компетенции
+        //для самостоятельной работы
+        var forms_control = {{ forms_control|safe }};
+        var type_samost_work = {{ type_samost_work|safe }};
+        //для лекций
+        var methods_teacher_lec = {{ methods_teacher_lec|safe }};
+        var next_discip = {{ next_discip|safe }};
+
+
+    </script>
+    <script type="text/javascript" src="{% static 'js/tables/content_and_interdisciprelat.js'%}"></script>
+    <script type="text/javascript" src="{% static 'js/tables/tablesectionshour.js'%}"></script>
+    <script type="text/javascript" src="{% static 'js/tables/table_lectures_hour.js'%}"></script>
+    <script type="text/javascript" src="{% static 'js/tables/table_samost_hour.js'%}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-tab.js' %}">  </script>
+{% endblock %}

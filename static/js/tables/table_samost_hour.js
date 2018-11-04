@@ -1,0 +1,71 @@
+var num_row_total_samost = 1;
+var num_total_for_table_samost = 0;
+
+function insertrow_samost(obj) {
+    var num_p_p = parseInt($(obj).jexcel('getValue', 'A' + num_row_total_samost.toString()));
+    var idCell = 'C' + (num_row_total_samost + 1).toString();
+    var text_total = $(obj).jexcel('getValue', idCell);
+    $(obj).jexcel('setValue', idCell, '');
+    num_row_total_samost += 1;
+    idCell = 'C' + (num_row_total_samost + 1).toString();
+    $(obj).jexcel('setValue', idCell, text_total);
+    //--------------------------------------------------
+    num_p_p += 1;
+    $(obj).jexcel('setValue', 'A' + num_row_total_samost.toString(), num_p_p);
+}
+
+function deleterow_samost(obj) {
+    num_row_total_samost -= 1;
+}
+
+$('#tablesamosthour').jexcel({
+    data: [
+        ['1','','','','',''],
+        ['','','Итого:','','',''],
+    ],
+    colHeaders: ['№ п/п',           '№ раздела и темы',                  'Наименование темы',
+                 'Трудоемкость (час.)', 'Виды контроля', 'Формируемые компетенции'],
+    colWidths: [ 100, 200, 200, 150, 250, 200],
+    oninsertrow: insertrow_samost,
+    ondeleterow: deleterow_samost,
+    allowInsertColumn:false,
+    columns: [
+              { type: 'numeric' },
+              { type: 'text' },
+              { type: 'autocomplete', source: type_samost_work },
+              { type: 'numeric' },
+              { type: 'autocomplete', source: forms_control },
+              { type: 'text' },
+             ]
+});
+
+$('#tablesamosthour').jexcel('updateSettings', {
+    cells: function (cell, col, row) {
+        if(col==3) {
+
+            if (row == num_row_total_samost) {
+                    $(cell).addClass('readonly');
+                    $(cell).html('' + numeral(Math.round(num_total_for_table_samost)).format('0'));
+                } else {
+                    $(cell).removeClass('readonly');
+                    if (row == 0) {
+                        num_total_for_table_samost = 0;
+                    }
+
+                    num_total_for_table_samost += parseFloat($(cell).text().replace(/,/, '.'));
+                }
+        }
+    }
+});
+
+$('#button_fill_hour_samost').on('click', function () {
+      var hour_samost = arrText2Num(hours_for_calc[3].split('/'));
+      hour_curr = hour_samost[0]/num_row_total_samost;// , hour_samost[1]/num_row_total_samost, hour_samost[2]/num_row_total_samost ];
+
+      for(var i=1; i<=num_row_total_samost; i++)
+      {
+          $('#tablesamosthour').jexcel('setValue', 'D'+i, numeral(hour_curr).format('0.0'));
+          $('#tablesamosthour').jexcel('setValue', 'F'+i, competence);
+      }
+
+});

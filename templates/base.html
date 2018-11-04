@@ -1,0 +1,27 @@
+{% load i18n staticfiles %}
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+    <meta charset="UTF-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static "css/style.css" %}" type="text/css" media="screen, projection"/>
+    <script type="text/javascript" src="{% static 'js/menu.js' %}"></script>
+    {% block header_settings %}{% endblock %}
+</head>
+<body id="body">
+    <div id="header">
+        {% include "global_menu.html" %}
+    </div>
+
+    <div class="content" id="content">
+    {% block content %}{% endblock %}
+    </div>
+
+    <footer id="footer">
+        <p class="footer-copyright">(C) 2018 филиал ТИУ в г. Сургуте, Штанов Ю.Н., Зиганшин Р.А.</p>
+    </footer>
+</body>
+
+{% block scripts_block %}{% endblock %}
+</html>

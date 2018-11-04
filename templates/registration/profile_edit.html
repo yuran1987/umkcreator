@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block content %}
+    <style>
+    #form_style1{
+        margin-top: 0px;
+        padding-top: 300px;
+        max-width: 1080px;
+    }
+    </style>
+
+    <div id="form_style1">
+        <div class="page-header">
+            <h3>Редактирование профиля:</h3>
+        </div>
+        <div id="profile_list1">
+        {% csrf_token %}
+        {% crispy form %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+{% block header_settings %}
+    <link rel="stylesheet" href="{%  static 'css/lobibox.min.css' %}"/>
+    <script src="{%  static 'js/jquery.1.11.min.js' %}"></script>
+    <script src="{%  static 'js/lobibox.min.js' %}"></script>
+    <script src="{%  static 'js/notifications.min.js' %}"></script>
+    <style>
+        #tablelist {
+            border-collapse: collapse;
+            cellpadding: 4;
+            cellspacing: 0;
+            width: 720px;
+        }
+        #tablelist td{
+            text-align: center;
+            border: 1px solid;
+        }
+        #inlinetablelist{
+            height: 600px;
+            width: 100%;
+            position: absolute;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="row">
+        <center><h2>Информация о системе:</h2></center>
+       <table id="tablelist" class="table">
+            <tbody id="inlinetablelist">
+            <tr><td>Операционная система:</td><td>{{ os_info }}</td></tr>
+            <tr><td>Имя узла:</td><td>{{ domain_name }}</td></tr>
+            <tr><td>Версия Python:</td><td>{{ python_ver }}</td></tr>
+            <tr><td>Версия Django:</td><td>{{ django_ver }}</td></tr>
+            <tr><td>Процессор:</td>
+                {% for cpu in cpu_list %}
+                    <td>{{ cpu }}</td>
+                {% endfor %}
+            </tr>
+            <tr><td>Количество ядер процессора:</td><td>{{ cpu_cores }}</td></tr>
+            <tr><td>Всего оперативной памяти:</td><td>{{ total_mem }}</td></tr>
+            <tr><td>Свободно оперативной памяти:</td><td>{{ free_mem }}</td></tr>
+            <tr><td>IPv4 адрес сервера:</td><td>{{ ip_address_server }}</td></tr>
+            <tr><td>IPv4 адрес вашего компьютера:</td><td>{{ ip_address_for_you }}</td></tr>
+            </tbody>
+       </table>
+    </div>
+{% endblock %}

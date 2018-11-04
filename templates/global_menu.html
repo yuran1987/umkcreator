@@ -1,0 +1,50 @@
+{% load i18n staticfiles %}
+<div id="bg">
+    <div class="container">
+        <ul class="menu">
+            <li><a href="/"><img src="{% static 'img/1.png' %}">Главная</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="#"><img src="{% static 'img/2.png' %}">Рабочая программа</a>
+                    <ul>
+                        <li><a href="{% url 'umkcreate'  %}">Создать</a></li>
+                        <li><a href="{% url 'umkcopy'  %}">Копировать</a></li>
+                        <li><a href="{% url 'showumklist'  %}">Список</a></li>
+                    </ul>
+                </li>
+                {% if user.is_superuser %}
+                <li><a href="#"><img src="{% static 'img/2.png' %}">Учебные планы</a>
+                    <ul>
+                        <li><a href="{% url 'planupload'  %}">Импорт уч. плана...</a></li>
+                        <li><a href="{% url 'uploadcompetence'  %}">Импорт компетенций...</a></li>
+                        <li><a href="{% url 'planlist'  %}">Список</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            {% endif %}
+            <li><a href="#">Справка</a>
+                <ul>
+                    <li><a href="{% url 'showNews' %}">Новости</a></li>
+                    <li><a href="#">Как пользоватся?</a></li>
+                    <li><a href="{% url 'showAuthors' %}">Авторы</a></li>
+                    <li><a href="{% url 'showSystemInfo' %}">Информация о системе</a></li>
+                </ul>
+            </li>
+
+            <li><a href="#">
+                {% if user.is_authenticated %}
+                    Пользователь: {{ user.username }}</a>
+                    <ul>
+                        <li><a href="{% url 'profile' slug=user.username  %}">Профиль</a></li>
+                        {% if user.position == 'io_zaf_kaf' or user.position == 'zaf_kaf' %}
+                            <li><a href="{% url 'umklistsign'  %}">На подпись</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'auth_logout' %}">{% trans "Log out" %}</a></li>
+                        <li><a href="{% url 'auth_password_change' %}">{% trans "Change password" %}</a></li>
+                {% else %}
+                        <li><a href="{% url 'auth_login' %}">{% trans "Log in" %}</a></li>
+                {% endif %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
