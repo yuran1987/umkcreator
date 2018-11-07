@@ -48,7 +48,7 @@
     <script>
         var num_row_total = 1;
         var num_total_for_table = "0/0/0";
-        var methods_teacher_prakt_labs = {{ meth_tech_pr_labs|safe }};
+        var methods_tech = {{ meth_tech|safe }};
         //-------------------------------ЗАГРУЗКА----------------------------------------------------------
         $.when( $.ready ).then(function() {
             data = $('#id_data_field').val();
@@ -115,7 +115,7 @@
                       { type: 'text',wordWrap:true},
                       { type: 'text' },
                       { type: 'text' },
-                      { type: 'autocomplete', source: methods_teacher_prakt_labs },
+                      { type: 'autocomplete', source: methods_tech },
                      ]
         });
 
@@ -125,8 +125,17 @@
                     if (row == num_row_total) {
                             $(cell).addClass('readonly');
                              var tmp = arrText2Num(num_total_for_table.split('/'));
-                             $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                             var hours = arrText2Num("{{ hours_for_calc|safe }}".split('/'));
+                             if(parseFloat(tmp[0]) != hours[0] || parseFloat(tmp[1]) != hours[1] || parseFloat(tmp[2]) != hours[2] ) {
+                                 $(cell).css('color', '#ff0000');
+                                 $(cell).html(num_total_for_table);
+                             }
+                             else {
+                                 $(cell).css('color', '#000000');
+                                 $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                             }
                         } else {
+                            $(cell).css('color', '#000000');
                             $(cell).removeClass('readonly');
                             if (row == 0) {
                                 num_total_for_table = "0/0/0";

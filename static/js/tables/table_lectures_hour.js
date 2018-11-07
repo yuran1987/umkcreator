@@ -37,18 +37,26 @@ $('#tablelectureshour').jexcel({
               { type: 'text',wordWrap:true },
               { type: 'text' },
               { type: 'text' },
-              { type: 'autocomplete', source: methods_teacher_lec },
+              { type: 'autocomplete', source: methods_teacher },
              ]
 });
 
 
 $('#tablelectureshour').jexcel('updateSettings', {
     cells: function (cell, col, row) {
+        $(cell).css('color', '#000000');
         if(col==3) {
             if (row == num_row_total_lec) {
                     $(cell).addClass('readonly');
                     var tmp = arrText2Num(num_total_for_table_lec.split('/'));
-                    $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                    var hour_lec_tmp = arrText2Num(hours_for_calc[0].split('/'));
+                    if(tmp[0]!=hour_lec_tmp[0] || tmp[1]!=hour_lec_tmp[1] || tmp[2]!=hour_lec_tmp[2]){
+                        $(cell).css('color', '#ff0000');
+                        $(cell).html(num_total_for_table_lec);
+                    }else {
+                        $(cell).css('color', '#000000');
+                        $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                    }
                 } else {
                     $(cell).removeClass('readonly');
                     if (row == 0) {

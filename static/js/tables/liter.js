@@ -89,6 +89,7 @@ $('#button_add_to_table').on('click', function () {
     $('#tablejexcel').jexcel('setValue', 'C'+num_row_total, literature_list[n]['year']);
     $('#tablejexcel').jexcel('setValue', 'D'+num_row_total, literature_list[n]['type']);
     $('#tablejexcel').jexcel('setValue', 'I'+num_row_total, literature_list[n]['place']);
+    $('#tablejexcel').jexcel('setValue', 'F'+num_row_total, 'неограниченный доступ');
     $('#tablejexcel').jexcel('setValue', 'J'+num_row_total, literature_list[n]['URL']);
     $('#tablejexcel').jexcel('setValue', 'H'+num_row_total, 100);
 

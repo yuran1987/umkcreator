@@ -109,9 +109,9 @@
 			$('#tablesectionshour').data('powertipjq', $('<p>Лекции'+hours_for_calc[0]
                 +'</p><p>Практ.зан. '+hours_for_calc[1]
                 +'</p><p>Лаб.раб. '+hours_for_calc[2]
-                +'</p><p>Самост.раб. '+hours_for_calc[3]
-                +'</p><p>Всего,час. '+hours_for_calc[4]
-                +'</p><p>Из них в интер.форме '+hours_for_calc[5]+'</p>'));
+                +'</p><p>Самост.раб. '+hours_for_calc[4]
+                +'</p><p>Всего,час. '+hours_for_calc[5]
+                +'</p><p>Из них в интер.форме '+hours_for_calc[6]+'</p>'));
 			$('#tablesectionshour').powerTip({placement: 'e',mouseOnToPopup: true});
 
 			$('#tablelectureshour').data('powertipjq', $('<p>Лекции '+hours_for_calc[0]+'</p>'));
@@ -124,7 +124,7 @@
                 if (parseInt(tmp[1]) > 0) zachot_exam_tooltip[i] += "экзамен в " + tmp[1] + " семестре;";
             }
 
-			$('#tablesamosthour').data('powertipjq', $('<p>Самост.раб.,час. '+hours_for_calc[3]+'</p><p>' +
+			$('#tablesamosthour').data('powertipjq', $('<p>Самост.раб.,час. '+hours_for_calc[4]+'</p><p>' +
                 zachot_exam_tooltip[0] + '</p><p>' +
                 zachot_exam_tooltip[1] + '</p><p>' +
                 zachot_exam_tooltip[2] + '</p><p> {{ kontrol_work_tooltip|safe}} </p>' ));
@@ -140,7 +140,7 @@
         var forms_control = {{ forms_control|safe }};
         var type_samost_work = {{ type_samost_work|safe }};
         //для лекций
-        var methods_teacher_lec = {{ methods_teacher_lec|safe }};
+        var methods_teacher = {{ methods_teacher|safe }};
         var next_discip = {{ next_discip|safe }};
 
 

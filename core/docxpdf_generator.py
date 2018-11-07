@@ -127,11 +127,11 @@ def get_OPOP_of_discipline(plans):
     code_OPOP = plans[0].code_OPOP
 
     if len(re.findall("Б", code_OPOP))==2:
-        res = 'базовой части блок {0}'.format(code_OPOP)
+        res = 'базовой части {0}'.format(code_OPOP)
     elif len(re.findall("Б", code_OPOP))==1 and len(re.findall("В", code_OPOP))==1:
-        res = 'вариативной части блок {0}'.format(code_OPOP)
+        res = 'вариативной части {0}'.format(code_OPOP)
     elif len(re.findall("Б", code_OPOP))==1 and len(re.findall("В", code_OPOP))==2:
-        res = 'дисциплине по выбору блок {0}'.format(code_OPOP)
+        res = 'дисциплине по выбору {0}'.format(code_OPOP)
     else:
         res = "не заполнено"
 
@@ -141,7 +141,7 @@ def get_placeInStructOPOP(plans, discipline, doc_tpl):
     prev_next_discip = previous_and_next_disciplines_from_umk(plans[0],Plans)
     res = ["",""]
     if prev_next_discip['previous_disciplines']:
-        res[0] = "Для полного усвоения данной дисциплины студенты должны знать следующие разделы ФГОС: "
+        res[0] = "Для полного усвоения данной дисциплины обучающиеся должны знать следующие дисциплины: "
         for d in prev_next_discip['previous_disciplines']:
             res[0] += " {0} - {1};".format(d.code_OPOP, d.discipline.name)
 
@@ -150,7 +150,7 @@ def get_placeInStructOPOP(plans, discipline, doc_tpl):
             res[0] +="."
 
     if prev_next_discip['next_disciplines']:
-        res[1] += "Знания по дисциплине \"{0}\" необходимы студентам данного направления для усвоения знаний по следующим дисциплинам: ".format(discipline)
+        res[1] += "Знания по дисциплине \"{0}\" необходимы обучающимся данного направления для усвоения знаний по следующим дисциплинам: ".format(discipline)
         for d in prev_next_discip['next_disciplines']:
             res[1] += " {0} - {1};".format(d.code_OPOP, d.discipline.name)
 
@@ -220,7 +220,7 @@ def get_table_labs_prakt(data,doc_tpl,type):
         if list[0][2] !='':
             table = sd.add_table(rows=1, cols=6,style='Table Grid')
             hdr_cells = table.rows[0].cells
-            hdr_cells[0].text = '№ раздела'
+            hdr_cells[0].text = '№ п/п'
             hdr_cells[1].text = '№ темы'
             hdr_cells[2].text = 'Темы {0} работ'.format(type)
             hdr_cells[3].text = 'Трудоемкость (час.)'
@@ -281,25 +281,37 @@ def get_kontrolnya(plans): #только для заочной формы обу
 
 def get_table_rating_day(doc_tpl, plan, umkdata):#Оценка результатов освоения учебной дисциплины для очной формы
     js = json.JSONDecoder()
-    #header = js.decode("[[\"20\",\"20\",\"20\",\"40\"]]")
-    sd = doc_tpl.new_subdoc()
+    datafortable = []
+    tmp = []
+    id = 0
+    for item in js.decode(umkdata.table_rating_ochka):
+        if re.search("Итого за \d-ую аттестацию", item[1]):
+            tmp.append(item[2].split("-")[1])
+            id += 1
+        if id==3:
+            datafortable.append(tmp)
+            tmp = []
+            id=0
 
+    sd = doc_tpl.new_subdoc()
     if umkdata.table_rating_ochka:
-        sd.add_paragraph('Рейтинговая система оценки по курсу «{0}» для студентов направления {1} очной формы обучения'.format(plan.discipline.name, plan.get_direction()))
-        # table1 = sd.add_table(rows=1, cols=4, style='Table Grid')
-        # hdr_cells = table1.rows[0].cells
-        # hdr_cells[0].text = '1-ый срок предоставления результатов текущего контроля'
-        # hdr_cells[1].text = '2-ый срок предоставления результатов текущего контроля'
-        # hdr_cells[2].text = '3-ый срок предоставления результатов текущего контроля'
-        # hdr_cells[3].text = 'Итоговый тест'
-        #
-        # for item in header:
-        #     row_cells = table1.add_row().cells
-        #     row_cells[0].text = item[0]
-        #     row_cells[1].text = item[1]
-        #     row_cells[2].text = item[2]
-        #     row_cells[3].text = item[3]
-        # sd.add_paragraph(" ")
+        sd.add_paragraph('Рейтинговая система оценки по дисциплине «{0}» для обучающихся направления {1} очной формы обучения'.format(plan.discipline.name, plan.get_direction()))
+        table1 = sd.add_table(rows=1, cols=4, style='Table Grid')
+        hdr_cells = table1.rows[0].cells
+        hdr_cells[0].text = '1-ый срок предоставления результатов текущего контроля'
+        hdr_cells[1].text = '2-ый срок предоставления результатов текущего контроля'
+        hdr_cells[2].text = '3-ый срок предоставления результатов текущего контроля'
+        hdr_cells[3].text = 'Итоговый тест'
+
+        for item in datafortable:
+            row_cells = table1.add_row().cells
+            print(item)
+            row_cells[0].text = item[0]
+            row_cells[1].text = item[1]
+            row_cells[2].text = item[2]
+            row_cells[3].text = '100'
+
+        sd.add_paragraph(" ")
         table = sd.add_table(rows=1, cols=4, style='Table Grid')
         hdr_cells = table.rows[0].cells
         hdr_cells[0].text = '№'
@@ -395,7 +407,7 @@ def render_context(id, doc_tpl):
                'kursovya_hours': "{0}".format(isEmptyVal(umkdata.kursovya_hours)),
                'raschotno_graph_work_semests': "{0}".format(umkdata.raschetnograp_work_semestr) if len(umkdata.raschetnograp_work_semestr)>1 else "-",
                'raschotno_graph_work_hours': "{0}".format(isEmptyVal(umkdata.raschetnograp_work_hours)),
-               'samost_work_other_hours': "{0}/{1}/{2}".format(samost_work_other_hours[0],samost_work_other_hours[1],samost_work_other_hours[2]),
+               #'samost_work_other_hours': "{0}/{1}/{2}".format(samost_work_other_hours[0],samost_work_other_hours[1],samost_work_other_hours[2]),
                'zanyatiya_in_interaktiv_hours': "{0}".format(plans[0].zanatiya_in_interak_forms_hours),
                'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if len(plans[0].zachot_semestr.split(','))>1 else isEmptyVal(plans[0].zachot_semestr),
                                                        plans[1].zachot_semestr if len(plans[1].zachot_semestr.split(',')) > 1 else isEmptyVal(plans[1].zachot_semestr),
@@ -407,7 +419,6 @@ def render_context(id, doc_tpl):
                'zachot_edinic': "{0}".format(plans[0].trudoemkost_zachot_edinic),
                'prikaz_number': dateprikaz[0],
                'prikaz_date': dateprikaz[1].strftime("%d.%m.%Y"),
-               'City': umk.creator.deparmt.units.city,
                'year': datetime.now().strftime("%Y"),
                'req_reconciliation': required_reconcil(umk.creator, plans),
                # -------------------------------------------------------------------------------------------------------

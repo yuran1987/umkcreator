@@ -14,7 +14,7 @@ from .docxpdf_generator import generation_docx, generation_docx_achive
 from .getsysinfo import get_os_info, get_cpu_info,get_meminfo,get_django_version,get_ip_address_server,get_ip_client, get_cpu_cores
 from .search_lit import get_lit_urait_json, get_lit_lanbook_json
 from .import_competence import CompetenceImport
-from .core_funcs import FORMS_CONTROL, TYPE_SAMOSTOYATELNOY_RABORY, METHODS_TEACHER_LEC, METHODS_TEACHER_PRAKT_LABS, TYPE_CONTROL_RATING ,previous_and_next_disciplines_from_umk, getTotalstr
+from .core_funcs import FORMS_CONTROL, TYPE_SAMOSTOYATELNOY_RABORY, METHODS_TEACHER, TYPE_CONTROL_RATING ,previous_and_next_disciplines_from_umk, getTotalstr
 from .umk2copy import umk_copy
 
 
@@ -211,6 +211,7 @@ def DataForUmk_core(request, id):
     hours_for_calc  = ['{0}/{1}/{2}'.format(str(plan[0].hours_lectures),str(plan[1].hours_lectures),str(plan[2].hours_lectures)), #лекции
                        '{0}/{1}/{2}'.format(str(plan[0].hours_pract),str(plan[1].hours_pract),str(plan[2].hours_pract)),          #практики
                        '{0}/{1}/{2}'.format(str(plan[0].hours_labs),str(plan[1].hours_labs),str(plan[2].hours_labs)),             #лаб
+                       '',
                        '{0}/{1}/{2}'.format(str(plan[0].hours_samost_work_sum),str(plan[1].hours_samost_work_sum),str(plan[2].hours_samost_work_sum)),#самост работа
                        '{0}/{1}/{2}'.format(str(plan[0].trudoemkost_all),str(plan[1].trudoemkost_all),str(plan[2].trudoemkost_all)), #всего
                        '{0}'.format(str(plan[0].zanatiya_in_interak_forms_hours))]  #интерактив
@@ -245,7 +246,7 @@ def DataForUmk_core(request, id):
                                              'competences': plan[0].comps.lstrip(),
                                              'forms_control': FORMS_CONTROL,
                                              'type_samost_work': TYPE_SAMOSTOYATELNOY_RABORY,
-                                             'methods_teacher_lec': METHODS_TEACHER_LEC,
+                                             'methods_teacher': METHODS_TEACHER,
                                              'next_discip': [ d.discipline.name for d in previous_and_next_disciplines_from_umk(plan[0], Plans)['next_disciplines']]})
 
 def DataForUmk_addons(request, id, type):
@@ -290,7 +291,7 @@ def DataForUmk_addons(request, id, type):
                                              'table_hour_tooltip': tooltip,
                                              'hours_for_calc': hours,
                                              'competences': tmp_plan[0].comps,
-                                             'meth_tech_pr_labs': METHODS_TEACHER_PRAKT_LABS})
+                                             'meth_tech': METHODS_TEACHER})
 
 
 def show_rating(request, id):

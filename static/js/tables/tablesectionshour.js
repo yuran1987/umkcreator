@@ -67,7 +67,6 @@ $('#tablesectionshour').jexcel({
 
 $('#tablesectionshour').jexcel('updateSettings', {
     cells: function (cell, col, row) {
-
        if (col > 1) {
             if (row == (num_row_total_sec - 1) && (col != 7)) {
                    $(cell).removeClass('readonly');
@@ -77,16 +76,30 @@ $('#tablesectionshour').jexcel('updateSettings', {
               }
             }
             if (row == num_row_total_sec) {
+                var hour = arrText2Num(hours_for_calc[col-2].split('/'));
                 if (col != 8){
                     var tmp = arrText2Num(num_total_for_tablesectionshour[col].split('/'));
-                    $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                    if((hour[0]!=tmp[0] || hour[1]!=tmp[1] || hour[2]!=tmp[2]) && col!=5){
+                        $(cell).css('color', '#ff0000');
+                        $(cell).html(num_total_for_tablesectionshour[col]);
+                    }else {
+                        $(cell).css('color', '#000000');
+                        $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
+                    }
                 }
                 else{
-                    var tmp = parseInt(num_total_for_tablesectionshour[col]);
-                    $(cell).html('' + numeral(Math.round(tmp)).format('0'));
+                    var tmp = parseFloat(num_total_for_tablesectionshour[col]);
+                    if(tmp != hour){
+                        $(cell).css('color', '#ff0000');
+                        $(cell).html(num_total_for_tablesectionshour[col]);
+                    }else {
+                        $(cell).css('color', '#000000');
+                        $(cell).html('' + numeral(Math.round(tmp)).format('0'));
+                    }
                 }
 
             } else {
+                $(cell).css('color', '#000000');
                 if (col < 8) {
                     if (row == 0) {
                         num_total_for_tablesectionshour[col] = '0/0/0';
@@ -108,12 +121,13 @@ $('#tablesectionshour').jexcel('updateSettings', {
                         if (row == 0) {
                             num_total_for_tablesectionshour[col] = '0';
                         }
-                        num_total_for_tablesectionshour[col] = numeral(parseFloat(num_total_for_tablesectionshour[col]) + parseFloat($(cell).text())).format('0');
+                        num_total_for_tablesectionshour[col] = numeral(parseFloat(num_total_for_tablesectionshour[col]) + parseFloat($(cell).text())).format('0.00');
                     }
                 }
             }
         }
         if(col == 7) {
+            $(cell).css('color', '#000000');
             $(cell).html('' + num_total_for_tablesectionshour_right_total[row]);
         }else{
             if (col == 0) {
@@ -146,8 +160,8 @@ $('#button_fill_hour_sections').on('click', function () {
       var hour_lec = arrText2Num(hours_for_calc[0].split('/'));
       var hour_prakt = arrText2Num(hours_for_calc[1].split('/'));
       var hour_labs = arrText2Num(hours_for_calc[2].split('/'));
-      var hour_samost = arrText2Num(hours_for_calc[3].split('/'));
-      var hour_interakiv = parseInt(hours_for_calc[5]);
+      var hour_samost = arrText2Num(hours_for_calc[4].split('/'));
+      var hour_interakiv = parseInt(hours_for_calc[6]);
 
       var format_str_lec = ['0.', '0.', '0.']
       var format_str_prakt = ['0.', '0.', '0.']
