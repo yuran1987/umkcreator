@@ -413,7 +413,7 @@ def render_context(id, doc_tpl):
                'samost_total_hours': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,
                                                           plans[1].hours_samost_work_sum,
                                                           plans[2].hours_samost_work_sum),
-               'kursovya_num_semestr': isEmptyValOrStr(kursovya_work_project_sem[0],kursovya_work_project_sem[1],kursovya_work_project_sem[2]),
+               'kursovya_num_semestr': isEmptyValOrStr(kursovya_work_project_sem[0],kursovya_work_project_sem[1],kursovya_work_project_sem[2]) if kursovya_work_project_sem else "-",
                'kursovya_hours': get_hour_kursovaya_work_or_project(umkdata),
                'raschotno_graph_work_semests': "-",
                'raschotno_graph_work_hours': "-",
