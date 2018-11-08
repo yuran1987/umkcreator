@@ -319,7 +319,7 @@ def get_table_rating_day(doc_tpl, plan, umkdata):#Оценка результа�
 
         for item in js.decode(umkdata.table_rating_ochka):
             if re.search("Итого за \d-ую аттестацию", item[1]):
-                tmp.append(item[2].split("-")[1])
+                tmp.append(item[2].split("-")[1] if re.search("0-\d+", item[2]) else item[2])
                 id += 1
             if id == 3:
                 datafortable.append(tmp)
