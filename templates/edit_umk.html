@@ -127,7 +127,7 @@
 			$('#tablesamosthour').data('powertipjq', $('<p>Самост.раб.,час. '+hours_for_calc[4]+'</p><p>' +
                 zachot_exam_tooltip[0] + '</p><p>' +
                 zachot_exam_tooltip[1] + '</p><p>' +
-                zachot_exam_tooltip[2] + '</p><p> {{ kontrol_work_tooltip|safe}} </p>' ));
+                zachot_exam_tooltip[2] + '</p><p> {{ kontrol_work_tooltip|safe}} </p>'+'{{ KPKR_tooltip|safe }}'));
 
 			$('#tablesamosthour').powerTip({placement: 'e',mouseOnToPopup: true});
 

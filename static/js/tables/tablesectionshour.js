@@ -144,7 +144,7 @@ $('#tablesectionshour').jexcel('updateSettings', {
             format_str = ["0.", "0.", "0."];
 
             for(var i=0; i<3; i++) {
-                for (var j = 1; j <= get_digits(curr[i]); j++)
+                for (var j = 1; j<=get_digits(curr[i]) && j<=3; j++)
                     format_str[i] += "0"
             }
 

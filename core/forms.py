@@ -71,12 +71,7 @@ class addDatafor_core(forms.ModelForm):
                                 Div(Button('button_calc','Рассчитать часы',css_class='btn btn-success', css_id='button_fill_hour_lec'))),
                             Tab(u'2.8 Перечень тем самостоятельной работы', Div(css_id='tablesamosthour', css_class='col-md-auto'), Div('table_samost_hour'),
                                     Div(Button('button_calc', 'Рассчитать часы', css_class='btn btn-success', css_id='button_fill_hour_samost'))),
-                            Tab(u'2.9 Примерная тематика курсовых проектов (работ)', Div('theme_kursovih_rabot'),
-                                Row(Div('kursovya_hours', css_class="col-md-3"),
-                                    Div('kursovya_semestr', css_class="col-md-2"),
-                                    Div('raschetnograp_work_hours', css_class="col-md-3"),
-                                    Div('raschetnograp_work_semestr', css_class="col-md-3"))
-                            )
+                            Tab(u'2.9 Примерная тематика курсовых проектов (работ)', Div('theme_kursovih_rabot'))
                         )
                     ),
                 Tab(u'3 Материально-техническое обеспечение дисциплины', Div('material_teh_obespech_dicip')),

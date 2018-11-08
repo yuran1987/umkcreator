@@ -1,5 +1,5 @@
 var num_row_total_samost = 1;
-var num_total_for_table_samost = 0;
+var num_total_for_table_samost = "0/0/0";
 
 function insertrow_samost(obj) {
     var num_p_p = parseInt($(obj).jexcel('getValue', 'A' + num_row_total_samost.toString()));
@@ -33,7 +33,7 @@ $('#tablesamosthour').jexcel({
               { type: 'numeric' },
               { type: 'text' },
               { type: 'autocomplete', source: type_samost_work },
-              { type: 'numeric' },
+              { type: 'text' },
               { type: 'autocomplete', source: forms_control },
               { type: 'text' },
              ]
@@ -43,23 +43,30 @@ $('#tablesamosthour').jexcel('updateSettings', {
     cells: function (cell, col, row) {
         $(cell).css('color', '#000000');
         if(col==3) {
-
             if (row == num_row_total_samost) {
                     $(cell).addClass('readonly');
-                    if(num_total_for_table_samost != arrText2Num(hours_for_calc[4].split('/'))[0]){
+                    var tmp = arrText2Num(num_total_for_table_samost.split('/'));
+                    var hour  = arrText2Num(hours_for_calc[4].split('/'));
+                    if(tmp[0] != hour[0] || tmp[1] != hour[1] || tmp[2] != hour[2]){
                         $(cell).css('color', '#ff0000');
                         $(cell).html(num_total_for_table_samost);
                     }else{
                         $(cell).css('color', '#000000');
-                        $(cell).html('' + numeral(Math.round(num_total_for_table_samost)).format('0'));
+                        $(cell).html('' + numeral(Math.round(tmp[0])).format('0') + '/' + numeral(Math.round(tmp[1])).format('0') + '/' + numeral(Math.round(tmp[2])).format('0'));
                     }
                 } else {
                     $(cell).removeClass('readonly');
                     if (row == 0) {
-                        num_total_for_table_samost = 0;
+                        num_total_for_table_samost = "0/0/0";
                     }
+                    //num_total_for_table_samost += parseFloat($(cell).text().replace(/,/, '.'));
+                    var tmp = arrText2Num($(cell).text().split('/'));
+                    var curr = arrText2Num(num_total_for_table_samost.split('/'));
 
-                    num_total_for_table_samost += parseFloat($(cell).text().replace(/,/, '.'));
+                    for (var index = 0; index < tmp.length; ++index) {
+                        curr[index] += tmp[index];
+                    }
+                    num_total_for_table_samost = numeral(curr[0]).format('0.0') + '/' + numeral(curr[1]).format('0.0') + '/' + numeral(curr[2]).format('0.0');
                 }
         }
     }
@@ -67,11 +74,11 @@ $('#tablesamosthour').jexcel('updateSettings', {
 
 $('#button_fill_hour_samost').on('click', function () {
       var hour_samost = arrText2Num(hours_for_calc[4].split('/'));
-      hour_curr = hour_samost[0]/num_row_total_samost;// , hour_samost[1]/num_row_total_samost, hour_samost[2]/num_row_total_samost ];
+      hour_curr = [hour_samost[0]/num_row_total_samost , hour_samost[1]/num_row_total_samost, hour_samost[2]/num_row_total_samost ];
 
       for(var i=1; i<=num_row_total_samost; i++)
       {
-          $('#tablesamosthour').jexcel('setValue', 'D'+i, numeral(hour_curr).format('0.0'));
+          $('#tablesamosthour').jexcel('setValue', 'D'+i, numeral(hour_curr[0]).format('0.0') + '/' + numeral(hour_curr[1]).format('0.0') + '/' + numeral(hour_curr[2]).format('0.0'));
           $('#tablesamosthour').jexcel('setValue', 'F'+i, competence);
       }
 

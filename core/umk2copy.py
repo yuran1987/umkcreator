@@ -17,10 +17,10 @@ def umk_copy(src_umk, dst_umk):
         dst_data.table_laborat_hour = src_data.table_laborat_hour
         dst_data.table_samost_hour = src_data.table_samost_hour
         dst_data.theme_kursovih_rabot = src_data.theme_kursovih_rabot
-        dst_data.kursovya_hours = src_data.kursovya_hours
-        dst_data.kursovya_semestr = src_data.kursovya_semestr
-        dst_data.raschetnograp_work_hours = src_data.raschetnograp_work_hours
-        dst_data.raschetnograp_work_semestr = src_data.raschetnograp_work_semestr
+        #dst_data.kursovya_hours = src_data.kursovya_hours
+        #dst_data.kursovya_semestr = src_data.kursovya_semestr
+        #dst_data.raschetnograp_work_hours = src_data.raschetnograp_work_hours
+        #dst_data.raschetnograp_work_semestr = src_data.raschetnograp_work_semestr
         dst_data.table_rating_ochka = src_data.table_rating_ochka
         dst_data.table_rating_zaochka = src_data.table_rating_zaochka
         dst_data.table_literature = src_data.table_literature

@@ -253,6 +253,29 @@ def get_table_samost_hours(umk_data):
                         'comps': item[5]})
     return res
 
+def get_hour_kursovaya_work_or_project(umk_data): #возвращает количество часов отведенных на курсовой проект или работу
+    res = "-/-/-"
+    js = json.JSONDecoder()
+    if umk_data.table_samost_hour:
+        list = js.decode(umk_data.table_samost_hour)
+
+        for item in list:
+            if re.findall('Выполнение курсового проекта / курсовой работы', item[2]):
+                res = num_is_empty(item[3])
+    return res
+
+def get_hour_raschetno_graph_work(umk_data):#возвращает количество часов отведенных на расчетно-графическую работу
+    res = "-/-/-"
+    js = json.JSONDecoder()
+    if umk_data.table_samost_hour:
+        list = js.decode(umk_data.table_samost_hour)
+
+        for item in list:
+            if re.findall('Выполнение расчетно-графических домашних работ', item[2]):
+                res = num_is_empty(item[3])
+    return res
+
+
 def get_table_literature(umkdata):
     res = []
     js = json.JSONDecoder()
@@ -266,9 +289,8 @@ def get_table_literature(umkdata):
 
 def get_kontrolnya(plans): #только для заочной формы обучения
     res = ''
-
     if plans[1].kontrolnaya_work == plans[2].kontrolnaya_work and  ( (plans[1].trudoemkost_all - plans[1].hours_samost_work_sum) == (plans[2].trudoemkost_all - plans[2].hours_samost_work_sum)):
-        res = 'Для заочной формы обучения предусмотрена контрольная работа объемом {1} часов в {2} семестре. '.format(plans[1].trudoemkost_all - plans[1].hours_samost_work_sum, plans[1].kontrolnaya_work)
+        res = 'Для заочной формы обучения предусмотрена контрольная работа объемом {0} часов в {1} семестре. '.format(plans[1].trudoemkost_all - plans[1].hours_samost_work_sum, plans[1].kontrolnaya_work)
     else:
         for i in range(1,3):
             srok = re.findall(r"\d\.\d|\d+", plans[i].get_training_form_display())[0]
@@ -284,14 +306,6 @@ def get_table_rating_day(doc_tpl, plan, umkdata):#Оценка результа�
     datafortable = []
     tmp = []
     id = 0
-    for item in js.decode(umkdata.table_rating_ochka):
-        if re.search("Итого за \d-ую аттестацию", item[1]):
-            tmp.append(item[2].split("-")[1])
-            id += 1
-        if id==3:
-            datafortable.append(tmp)
-            tmp = []
-            id=0
 
     sd = doc_tpl.new_subdoc()
     if umkdata.table_rating_ochka:
@@ -303,9 +317,17 @@ def get_table_rating_day(doc_tpl, plan, umkdata):#Оценка результа�
         hdr_cells[2].text = '3-ый срок предоставления результатов текущего контроля'
         hdr_cells[3].text = 'Итоговый тест'
 
+        for item in js.decode(umkdata.table_rating_ochka):
+            if re.search("Итого за \d-ую аттестацию", item[1]):
+                tmp.append(item[2].split("-")[1])
+                id += 1
+            if id == 3:
+                datafortable.append(tmp)
+                tmp = []
+                id = 0
+
         for item in datafortable:
             row_cells = table1.add_row().cells
-            print(item)
             row_cells[0].text = item[0]
             row_cells[1].text = item[1]
             row_cells[2].text = item[2]
@@ -362,19 +384,7 @@ def render_context(id, doc_tpl):
         Plans.objects.get(id=umk.plan_zu),
     ]
     dateprikaz = plans[0].get_direction_date_prikaz()
-
-    samost_work_other_hours = [int(plans[0].hours_samost_work_sum), int(plans[1].hours_samost_work_sum), int(plans[2].hours_samost_work_sum)]
-
-    if int(umkdata.raschetnograp_work_hours) > 0:
-        samost_work_other_hours[0] -= int(umkdata.raschetnograp_work_hours)
-        samost_work_other_hours[1] -= int(umkdata.raschetnograp_work_hours)
-        samost_work_other_hours[2] -= int(umkdata.raschetnograp_work_hours)
-
-    if int(umkdata.kursovya_hours)>0:
-        samost_work_other_hours[0] -= int(umkdata.kursovya_hours)
-        samost_work_other_hours[1] -= int(umkdata.kursovya_hours)
-        samost_work_other_hours[2] -= int(umkdata.kursovya_hours)
-
+    kursovya_work_project_sem = [re.findall("\d+",plan.kursovya_work_project)[0] for plan in plans if re.findall("\d+",plan.kursovya_work_project)] #номер семестра на курсовой проект
 
     context = {'ministerstvo': umk.creator.deparmt.units.univer.ministerstvo,
                'UNIVERCITY': umk.creator.deparmt.units.univer.name,
@@ -403,11 +413,10 @@ def render_context(id, doc_tpl):
                'samost_total_hours': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,
                                                           plans[1].hours_samost_work_sum,
                                                           plans[2].hours_samost_work_sum),
-               'kursovya_num_semestr': "{0}".format(umkdata.kursovya_semestr) if len(umkdata.kursovya_semestr)>1 else "-",
-               'kursovya_hours': "{0}".format(isEmptyVal(umkdata.kursovya_hours)),
-               'raschotno_graph_work_semests': "{0}".format(umkdata.raschetnograp_work_semestr) if len(umkdata.raschetnograp_work_semestr)>1 else "-",
-               'raschotno_graph_work_hours': "{0}".format(isEmptyVal(umkdata.raschetnograp_work_hours)),
-               #'samost_work_other_hours': "{0}/{1}/{2}".format(samost_work_other_hours[0],samost_work_other_hours[1],samost_work_other_hours[2]),
+               'kursovya_num_semestr': isEmptyValOrStr(kursovya_work_project_sem[0],kursovya_work_project_sem[1],kursovya_work_project_sem[2]),
+               'kursovya_hours': get_hour_kursovaya_work_or_project(umkdata),
+               'raschotno_graph_work_semests': "-",
+               'raschotno_graph_work_hours': "-",
                'zanyatiya_in_interaktiv_hours': "{0}".format(plans[0].zanatiya_in_interak_forms_hours),
                'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if len(plans[0].zachot_semestr.split(','))>1 else isEmptyVal(plans[0].zachot_semestr),
                                                        plans[1].zachot_semestr if len(plans[1].zachot_semestr.split(',')) > 1 else isEmptyVal(plans[1].zachot_semestr),
@@ -435,12 +444,11 @@ def render_context(id, doc_tpl):
                'tbl_labs_hours': get_table_labs_prakt(umkdata.table_laborat_hour, doc_tpl, 'лабораторных'),
                'tbl_samost_hours': get_table_samost_hours(umkdata),
                'tbl_liter': get_table_literature(umkdata),
-               'samost_total': plans[0].hours_samost_work_sum,
-               'samost_total_without_prepod': plans[0].hours_samost_wo_lec,
-               'samost_total_with_student': plans[0].hours_samost_w_lec_w_stud,
-               'samost_total_with_group': plans[0].hours_samost_w_lec_w_group,
+               'samost_total': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,plans[1].hours_samost_work_sum,plans[2].hours_samost_work_sum),
+               'samost_total_without_prepod': "{0}/{1}/{2}".format(plans[0].hours_samost_wo_lec,plans[1].hours_samost_work_sum,plans[2].hours_samost_work_sum),
+               'samost_total_with_student': "{0}/-/-".format(plans[0].hours_samost_w_lec_w_stud),
+               'samost_total_with_group': "{0}/-/-".format(plans[0].hours_samost_w_lec_w_group),
                'theme_kursovii_work': umkdata.theme_kursovih_rabot if len(umkdata.theme_kursovih_rabot)>1 else 'Учебным планом выполнение курсовых работ не предусмотрено.',
-               'kontrolnya_text': get_kontrolnya(plans),
                'materialno_texnicheskoe_obespechenie': html_to_docx(umkdata.material_teh_obespech_dicip, doc_tpl),
                'database_info_system': html_to_docx(umkdata.database_info_system, doc_tpl),
                #-------------------------------------------Рейтинг------------------------------------------------------
@@ -454,9 +462,6 @@ def render_context(id, doc_tpl):
                'smr_z': plans[1].get_semestrs(),
                'smr_zu': plans[2].get_semestrs()
                }
-
-
-
     return context
 
 #    Создание/Генерирование аннотации

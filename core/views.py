@@ -1,4 +1,4 @@
-from django.shortcuts import render, render_to_response, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.http import Http404, JsonResponse
 from django.conf import settings
@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.views.generic import DetailView, UpdateView
 from django.contrib.auth import get_user_model
 from tempfile import NamedTemporaryFile
-import os,re
+import re
 from .forms import SelectDisipForm,SelectPlanForm,addDatafor_core, addDatafor_addons_form, rating_form, UploadFilePlanForm, literature_form, UploadFileCompetenceForm, UserFormEdit,Umkcopy_form
 from .import_plans import PlanImport, TypeEduPlan
 from .models import UmkArticles,Plans, UmkData, User
@@ -216,7 +216,7 @@ def DataForUmk_core(request, id):
                        '{0}/{1}/{2}'.format(str(plan[0].trudoemkost_all),str(plan[1].trudoemkost_all),str(plan[2].trudoemkost_all)), #всего
                        '{0}'.format(str(plan[0].zanatiya_in_interak_forms_hours))]  #интерактив
 
-    kpkr = "<p>"
+    kpkr = "<p>Курсовая работа/проект в семестре: "
     for i in range(0,3):
         if plan[i].kursovya_work_project:
             kpkr += plan[i].kursovya_work_project + "/"
@@ -225,7 +225,7 @@ def DataForUmk_core(request, id):
 
     kpkr += "</p>"
     if re.search("-/-/-",kpkr):
-        kpkr = "<p>Учебным планом курсовых работа/проектов не предусмотрено.</p><p>Поэтому данное поле можно оставить пустым.</p>"
+        kpkr = "<p>Учебным планом курсовых работ/проектов не предусмотрено.</p>"
 
     if not plan[1].kontrolnaya_work and not plan[2].kontrolnaya_work:
         kontrol_tooltip = ""

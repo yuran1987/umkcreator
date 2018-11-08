@@ -253,7 +253,6 @@ class UmkData(models.Model):
     umk_id = models.OneToOneField(UmkArticles, on_delete=models.CASCADE, verbose_name=u'ID рабочей программы')
     aim = models.TextField(verbose_name=u'Цель дисциплины')
     tasks = models.TextField(verbose_name=u'Задачи дисциплины')
-    #placeInStruct = models.TextField(verbose_name=u'Место дисциплины в структуре ОПОП')
     contentOfSections = models.TextField(verbose_name=u'Содержание разделов и тем дисциплины', null=True)
     interdiscipRelations = models.TextField(verbose_name=u'Междисциплинарные связи c обеспециваемыми дисциплины', null=True)
     table_sections_hour = models.TextField(verbose_name=u'Разделы (модули), темы дисциплин ви виды занятий', null=True)
@@ -263,10 +262,6 @@ class UmkData(models.Model):
     table_samost_hour = models.TextField(verbose_name=u'Перечень самостоятельных занятий', null=True)
     #-----------------------------------
     theme_kursovih_rabot = models.TextField(verbose_name=u'Примерная тематика курсовых проектов (работ)', null=True, blank=True)
-    kursovya_hours = models.PositiveIntegerField(default=0, verbose_name=u'Количество часов на курсовую работу,часов')  # Количество часов на курсовую работу
-    kursovya_semestr = models.CharField(default="0", max_length=15, verbose_name=u'Номер cеместра на курсовую')  # Номер семестра на курсовую работу
-    raschetnograp_work_hours = models.PositiveIntegerField(default=0, verbose_name=u'Количество часов на расчетно-графическую работу, часов')  # Количество часов на расчетно-графическую работу
-    raschetnograp_work_semestr = models.CharField(default="0", max_length=15, verbose_name=u'Номер семестра на расчетно-графическую работу')  # Номер семестра на расчетно-графическую работу
     # -----------------------------------
     table_rating_ochka = models.TextField(verbose_name=u'Рейтинговая система оценки для очников', null=True, blank=True)
     table_rating_zaochka = models.TextField(verbose_name=u'Рейтинговая система оценки для заочников', null=True, blank=True)
