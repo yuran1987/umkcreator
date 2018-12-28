@@ -1,5 +1,6 @@
 from docx import Document
 from .models import Competence
+import re
 
 ############################################################################################
 dump_test = False
@@ -12,27 +13,30 @@ class CompetenceImport(object):
         print("file: " + fname)
 
         document = Document(fname)
-        work_table = None
+        wtable_prof_deyat = None
+        wtable_lev_copeten = None
 
         # find table
         for table in document.tables:
             for row in table.rows:
                 for cell in row.cells:
-                    str_val = str(cell.text)
-                    if str_val == u'Вид профессиональной деятельности':
-                        work_table = table
+                    if str(cell.text) == u'Вид профессиональной деятельности':
+                        wtable_prof_deyat = table
+                    elif str(cell.text) == u'Уровень сформированности компетенции':
+                        wtable_lev_copeten = table
                 break
 
-        if work_table is None:
-            print("---> table not found")
+        if (wtable_prof_deyat is None) or (wtable_lev_copeten is None):
+            print("---> tables not found")
             return None
 
+        print('Starting analyse prof table...')
         self.table_data = dict()
         prof_record_name = None  # this is 1 column
         prof_record = None  # this is 1 column
 
         # skip first 3 rows
-        rows_iter = iter(work_table.rows)
+        rows_iter = iter(wtable_prof_deyat.rows)
         for i in range(3):
             next(rows_iter)
 
@@ -50,7 +54,52 @@ class CompetenceImport(object):
             assert not comptn_numb_name in prof_record.keys()
             prof_record[comptn_numb_name] = self.prepare_comp_info(row.cells)
 
-    def prepare_comp_info(self,cells):
+        print('Starting analyse indicators table...')
+        self.table_indicators = dict()
+        table = []
+
+        for row in range(1, len(wtable_lev_copeten.rows)):
+            table.append({'0': wtable_lev_copeten.cell(row, 0).text, '1': wtable_lev_copeten.cell(row, 1).text,
+                          '2': wtable_lev_copeten.cell(row, 2).text})
+
+        for name in self.comp_list:
+            indicators = self.get_indicators(table, name)
+            self.table_indicators[name] = indicators
+
+        print('Finish.')
+
+    def get_indicators(self, table, competence):
+        num_copt = '0'
+        flag = False
+        indicators_know = ""
+        indicators_can = ""
+        indicators_own = ""
+
+        for row in table:
+            s = row['0']
+            if re.search(competence, s):  # competence - искомая компетенция
+                res = re.findall(r"\d+", s)  # .split("-")[1]
+                if (num_copt != res):
+                    num_copt = res
+                    flag = True
+                else:
+                    flag = False
+            elif flag == True:
+                tmp = re.findall(r"\d+", s)
+                if tmp:
+                    if tmp != num_copt:  # re.findall(r"\d+",s.split("-")[1])
+                        break
+                else:
+                    if re.search(r'Знает', row['1']):
+                        indicators_know += "{0}; ".format(row['2'])
+                    elif re.search(r'Умеет', row['1']):
+                        indicators_can += "{0}; ".format(row['2'])
+                    elif re.search(r'Владеет', row['1']):
+                        indicators_own += "{0}; ".format(row['2'])
+
+        return {'indicators_know': indicators_know, 'indicators_can': indicators_can, 'indicators_own': indicators_own}
+
+    def prepare_comp_info(self, cells):
         result_data = dict()
 
         result_data["description"] = cells[2].text.strip()
@@ -63,7 +112,6 @@ class CompetenceImport(object):
         dat = cells[7].text
         result_data["disciplines"] = [x.strip() for x in list(filter(None, dat.split(',')))]
         result_data["methods"] = cells[8].text.strip()
-
         return result_data
 
     def get_discipline_list(self):
@@ -126,10 +174,16 @@ class CompetenceImport(object):
 
         for name in self.comp_list:
             comp_record = self.find_competence(name)
+            indicators = self.table_indicators[name]
+            print(indicators['indicators_know'])
+
             comp_new = Competence(name=name, direction=direc, full_content=comp_record['description'],
                                   should_know=comp_record['should_know'],
                                   should_able=comp_record['should_able'],
                                   should_master=comp_record['should_master'],
-                                  training_program=tr_prog, qualif=qualif)
+                                  training_program=tr_prog, qualif=qualif,
+                                  indicators_know=indicators['indicators_know'],
+                                  indicators_can=indicators['indicators_can'],
+                                  indicators_own=indicators['indicators_own'])
             comp_new.save()
 

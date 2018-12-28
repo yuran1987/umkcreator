@@ -71,7 +71,8 @@ class addDatafor_core(forms.ModelForm):
                                 Div(Button('button_calc','Рассчитать часы',css_class='btn btn-success', css_id='button_fill_hour_lec'))),
                             Tab(u'2.8 Перечень тем самостоятельной работы', Div(css_id='tablesamosthour', css_class='col-md-auto'), Div('table_samost_hour'),
                                     Div(Button('button_calc', 'Рассчитать часы', css_class='btn btn-success', css_id='button_fill_hour_samost'))),
-                            Tab(u'2.9 Примерная тематика курсовых проектов (работ)', Div('theme_kursovih_rabot'))
+                            Tab(u'2.9 Примерная тематика курсовых проектов (работ)', Div('theme_kursovih_rabot')),
+                            Tab(u'2.10 Лицензионное программное обеспечение', Div('software_lic')),
                         )
                     ),
                 Tab(u'3 Материально-техническое обеспечение дисциплины', Div('material_teh_obespech_dicip')),
@@ -91,6 +92,7 @@ class addDatafor_core(forms.ModelForm):
         self.fields['table_samost_hour'].widget = forms.HiddenInput()
         self.fields['material_teh_obespech_dicip'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
         self.fields['database_info_system'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
+        self.fields['software_lic'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
 
     def save(self, id, umk_id, table_prakt_hour, table_laborat_hour, table_rating_ochka, table_rating_zaochka, table_literature, commit=True):
         instance = super(addDatafor_core, self).save(commit=False)
@@ -174,6 +176,35 @@ class literature_form(forms.Form):
 
     class Meta:
         fields = ['data_field','liters_list','liter_search']
+
+
+
+################################################################################
+#
+#
+#                       КОС
+#
+#
+################################################################################
+class form_kos(forms.Form):
+    data_field = forms.Field(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(form_kos, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Div('data_field'),
+            FormActions(Submit('next', u'Сохранить', css_class="btn-primary", css_id='btn_save_data_umk'),
+                        Submit('cancel', u'Назад'))
+        )
+
+
+
+
+
+
+
+
 
 
 

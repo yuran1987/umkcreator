@@ -90,6 +90,9 @@ class Competence(models.Model): #Список компетенций
     should_master = models.TextField(verbose_name=u'Должен владеть')
     training_program = models.CharField(max_length=30, verbose_name=u'Программа обучения', choices=TRANING_PROGRAMS)  # Программа обучения
     qualif = models.CharField(max_length=12, default='Bachelor', verbose_name=u'Квалификация', choices=QUALIFICATION_VALUES)  # Квалификация
+    indicators_know = models.TextField(verbose_name=u'Показатели знать', null=True)
+    indicators_can = models.TextField(verbose_name=u'Показатели уметь', null=True)
+    indicators_own = models.TextField(verbose_name=u'Показатели владеть', null=True)
 
     class Meta:
         verbose_name = u'Компетенции'
@@ -268,7 +271,9 @@ class UmkData(models.Model):
     table_literature = models.TextField(verbose_name=u'Список литературы', null=True, blank=True)
     material_teh_obespech_dicip = models.TextField(verbose_name=u'Материально-техническое обеспечение дисциплины')
     database_info_system = models.TextField(verbose_name=u'Базы данных, информационно-справочные и поисковые системы', null=True, blank=True)
-
+    software_lic = models.TextField(verbose_name=u'Лицензионное программное обеспечение', null=True, blank=True)
+    #-----------------------------------------КОС------------------------------
+    kos = models.TextField(verbose_name=u'Комплект оценочных средств', null=True, blank=True)
 
     class Meta:
         verbose_name = u'Данные раб.программы'

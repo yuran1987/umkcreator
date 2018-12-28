@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^tinymce/', include('tinymce.urls')),
     url('', include('core.urls')),
+    url('^utils', include('utils.urls')),
 ]
 
 #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -6,8 +6,8 @@ from django.core.urlresolvers import reverse
 from django.views.generic import DetailView, UpdateView
 from django.contrib.auth import get_user_model
 from tempfile import NamedTemporaryFile
-import re
-from .forms import SelectDisipForm,SelectPlanForm,addDatafor_core, addDatafor_addons_form, rating_form, UploadFilePlanForm, literature_form, UploadFileCompetenceForm, UserFormEdit,Umkcopy_form
+import re, json
+from .forms import SelectDisipForm,SelectPlanForm,addDatafor_core, addDatafor_addons_form, rating_form, UploadFilePlanForm, literature_form, UploadFileCompetenceForm, UserFormEdit,Umkcopy_form, form_kos
 from .import_plans import PlanImport, TypeEduPlan
 from .models import UmkArticles,Plans, UmkData, User
 from .docxpdf_generator import generation_docx, generation_docx_achive
@@ -380,6 +380,77 @@ def actions(request, type, id=0, direct_id=0, tr_program=''):
                                                          'profiles': plans[0].get_profiles(),
                                                          'actions_list': act,
                                                          'umk_id':id})
+
+
+###################################################################################################################
+#
+#
+#   КОС
+#
+#
+###################################################################################################################
+def edit_kos(request,title,kos_id, id):
+    umkdata = UmkData.objects.get(umk_id_id=id)
+    js_de = json.JSONDecoder()
+    kos = js_de.decode(umkdata.kos) if umkdata.kos else {'tekushii_kontrol': '', 'zad_konr_rabot': '', 'reshenie_zadach': '', 'themes_referat': '', 'voprosy_k_exameny': '', 'voprosy_k_zachoty': '',
+                                                         'zad_lab_rab': '', 'zad_prakt_rab': ''}
+
+    if request.method == 'POST':
+        form = form_kos(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            js_en = json.JSONEncoder()
+            kos[kos_id] = form.cleaned_data['data_field']
+            umkdata.kos = js_en.encode(kos)
+            umkdata.save()
+            print("Post Save: ", umkdata.kos)
+            return HttpResponseRedirect(reverse('kos_menu',kwargs={'id': id}))
+    else:
+        form = form_kos(initial={'data_field': kos[kos_id] if kos else ''})
+        form.fields['data_field'].label = title
+
+    return render(request, 'form_bootstrap.html', {'title': settings.SITE_NAME, 'form': form}) #, 'title_form': title
+
+
+def kos_menu(request, id):
+    umkdata = UmkData.objects.get(umk_id_id=id)
+    js = json.JSONDecoder()
+    lmenu = []
+
+    for item in js.decode(umkdata.table_rating_ochka):
+        if re.search("тестиров", item[1].lower()):
+            lmenu.append({'url':"kos_cur_control", 'name':'Типовые задания для текущего контроля'})
+        elif re.search("лаборат", item[1].lower()):
+            lmenu.append({'url': "kos_labs", 'name': 'Комплект заданий для лабораторной работы'})
+        elif re.search("практ", item[1].lower()):
+            lmenu.append({'url': "kos_prakt", 'name': 'Комплект заданий для практической работы'})
+        elif re.search("контрол", item[1].lower()):
+            lmenu.append({'url': "kos_kontr_work", 'name': 'Комплект заданий для контрольной работы'})
+        elif re.search("реферат", item[1].lower()):
+            lmenu.append({'url': "kos_referat", 'name': 'Темы рефератов'})
+        elif re.search("эссе", item[1].lower()):
+            lmenu.append({'url': "kos_referat", 'name': 'Темы эссе'})
+        elif re.search("доклад", item[1].lower()):
+            lmenu.append({'url': "kos_referat", 'name': 'Темы докладов'})
+        elif re.search("задач", item[1].lower()):
+            lmenu.append({'url': "kos_zadachi", 'name': 'Комплект разноуровневых заданий (задач)'})
+
+    plan = Plans.objects.get(id = umkdata.umk_id.plan_ochka)
+    if plan.exam_semestr:
+        lmenu.append({'url': "kos_vorosy_exam", 'name': 'Вопросы к экзамену'})
+    if plan.zachot_semestr:
+        lmenu.append({'url': "kos_vorosy_zachot", 'name': 'Вопросы к зачету'})
+
+
+    llmenu = []
+    for item in lmenu:
+        if item not in llmenu:
+            llmenu.append(item)
+
+
+    return render(request, 'kos_menu.html', {'title': settings.SITE_NAME,
+                                                     'actions_list': llmenu,
+                                                     'umk_id': id})
 #######################################################################################################################
 #
 #

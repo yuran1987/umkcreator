@@ -11,6 +11,11 @@
                         <li><a href="{% url 'showumklist'  %}">Список</a></li>
                     </ul>
                 </li>
+                <li><a href="#"><img src="{% static 'img/2.png' %}">Утилиты</a>
+                    <ul>
+                        <li><a href="{% url 'convert2pdf'  %}">Вырезать/вклеить</a></li>
+                    </ul>
+                </li>
                 {% if user.is_superuser %}
                 <li><a href="#"><img src="{% static 'img/2.png' %}">Учебные планы</a>
                     <ul>

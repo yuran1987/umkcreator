@@ -18,26 +18,21 @@
                 <div class="col-sm-12">
                     <div class="page-header">
                         <center>
-                        <h4>{{ discipline }} <<{{ direction }}>></h4>
-                        <h5>{{ profiles }}:</h5>
+                        <h5>Комплект оценочных средств:</h5>
                         </center>
                     </div>
                 </div>
             </div>
             <div id="list_actionstable">
                 <ol>
-                 <li><a href="{% url 'showumklist' %}">Назад</a></li>
-                 <li><a href="{% url 'umk_edit_core' umk_id %}">Основное</a></li>
+                 <li><a href="{% url 'umk_edit_menu' umk_id %}">Назад</a></li>
                  {% if actions_list %}
                     {% for act in actions_list %}
-                        <li><a href="{{ act.url }}">{{ act.name }}</a></li>
+                        <li><a href="{% url act.url umk_id %}">{{ act.name }}</a></li>
                     {% endfor %}
                 {% else %}
-                    <li>Извините, но действий для лабораторных, семинарских, и практических работ отсутствуют.</li>
+                    <li>Извините, но действий для КОСов отсутствуют.</li>
                 {% endif %}
-                <li><a href="{% url 'showrating' umk_id %}">Рейтинговая система оценки</a></li>
-                <li><a href="{% url 'showliter' umk_id %}">Литература</a></li>
-                <li><a href="{% url 'kos_menu' umk_id %}">Комплект оценочных средств (КОС)</a></li>
                 </ol>
             </div>
         {% endif %}
