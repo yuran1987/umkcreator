@@ -90,7 +90,7 @@ def context_workprogram(umk, umkdata, plans, doc_tpl):
                'theme_kursovii_work': umkdata.theme_kursovih_rabot if len(umkdata.theme_kursovih_rabot)>1 else 'Учебным планом выполнение курсовых работ не предусмотрено.',
                'materialno_texnicheskoe_obespechenie': html_to_docx(umkdata.material_teh_obespech_dicip, doc_tpl),
                'database_info_system': html_to_docx(umkdata.database_info_system, doc_tpl),
-               'software_obespechenie': html_to_docx(umkdata.software_lic, doc_tpl),
+               'software_obespechenie': html_to_docx(umkdata.software_lic, doc_tpl) if umkdata.software_lic else '',
                #-------------------------------------------Рейтинг------------------------------------------------------
                'rating_day': get_table_rating_day(doc_tpl,plans[0], umkdata),
                'rating_night':get_table_rating_night(doc_tpl, umkdata),
