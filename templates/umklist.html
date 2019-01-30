@@ -1,12 +1,15 @@
 {% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
 {% block header_settings %}
     <link rel="stylesheet" href="{%  static 'css/lobibox.min.css' %}"/>
+    <link rel="stylesheet" href="{%  static 'css/combobox.css' %}"/>
     <script src="{%  static 'js/jquery.1.11.min.js' %}"></script>
     <script src="{%  static 'js/lobibox.min.js' %}"></script>
     <script src="{%  static 'js/notifications.min.js' %}"></script>
+    <script src="{%  static 'js/jcombobox.js' %}"></script>
     <style>
+
         #tablelist {
-            width: 860px;
+            margin-top: 10px;
             border-collapse: collapse;
             border: 1px solid;
             cellpadding: 4;
@@ -19,8 +22,7 @@
 
         #inlinetablelist{
             overflow-y: scroll;
-            height: 700px;
-            width: 100%;
+            height: 350px;
             position: absolute;
         }
 
@@ -30,6 +32,11 @@
 
         #btn_export:focus {
             outline: none !important
+        }
+
+        #buttons {
+            margin-top: 350px;
+            position: absolute;
         }
     </style>
 {% endblock %}
@@ -44,55 +51,125 @@
                 <h1>Ваши рабочие программы:</h1>
                 </center>
             </div>
+            <div class="container-combobox">
+                <div class="ui-widget">
+                    <div class="row">
+                        <div>
+                        <div class="col-md-1">Фильтры:</div>
+                        <div class="col-md-2" title="Программа обучения:">
+                            <select id="combobox_tp">
+                                <option value=""></option>
+                                <option value="Academic">Академический</option>
+                                <option value="Applied">Прикладной</option>
+                            </select>
+                        </div>
+                        </div>
+                        <div class="col-md-2" title="Дисциплина:">
+                            <select id="combobox_discip" style="width:200px;">
+                                <option value=""></option>
+                                {% for d in discipline_list %}
+                                <option value={{ d.name }}>{{ d.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="list_umktable">
-        <table id="tablelist" class="table table-bordered table-sm">
-            {% if umk_list %}
-                <tbody id="inlinetablelist">
-                <tr>
-                <th>№</th>
-                <th>Направление, квалификация</th>
-                <th>Название</th>
-                <th>Дата создания</th>
-                <th>Дата изменения</th>
-                <th>Статус</th>
-                <th>Действие</th>
-               </tr>
-                {% for umk in umk_list %}
-                    <tr>
-                    <th><input type="checkbox" value="{{ umk.id }}" title="id: {{ umk.id }}"></th>
-                    <th>{{ umk.type }}</th>
-                    <th><a href="#">{{ umk.name }}</a></th>
-                    <th>{{ umk.datetime_create }}</th>
-                    <th>{{ umk.datetime_changed }}</th>
-                    <th>{{ umk.status }}</th>
-                    {% if umk.status_raw == "signaturing" or umk.status_raw == "confirmed" %}
-                        <th>Нет действий</th>
-                    {% else %}
-                        <th><a href="/umk/edit/{{ umk.id }}/">Изменить</a></th>
-                    {% endif %}
-                    </tr>
-                {% endfor %}
-                <tr>
-                    <td><button type="button" class="btn btn-success" id="btn_export">Экспорт</button></td>
-                    <td><button type="button" class="btn btn-primary" id="btn_send2sign" title="Данным действием Вы отправите рабочую(-ие) программу(-мы) на подпись зав.кафедрой">На подпись</button></td>
-                    <td><button type="button" class="btn btn-danger" id="btn_delete">Удалить</button></td>
-                </tr>
-                </tbody>
-            {% else %}
-                <tr>Извините, но Вы не создали ни одну рабочую программу</tr>
-            {% endif %}
-         </table>
 
-    </div>
+    <table id="tablelist" class="table table-bordered table-sm">
+        {% if discipline_list %}
+            <tbody id="inlinetablelist">
+            </tbody>
+        {% else %}
+            <tr>Извините, но Вы не создали ни одну рабочую программу</tr>
+        {% endif %}
+     </table>
+    <div class="row" id="buttons">
+        <button type="button" class="btn btn-success" id="btn_export">Экспорт</button>
+        <button type="button" class="btn btn-primary" id="btn_send2sign" title="Данным действием Вы отправите рабочую(-ие) программу(-мы) на подпись зав.кафедрой">На подпись</button>
+        <button type="button" class="btn btn-danger" id="btn_delete">Удалить</button>
+        </div>
     {% endif %}
-
 
 {% endblock %}
 
 {% block scripts_block %}
     <script>
+        function filter_changed() {
+            var traning_program = $("#combobox_tp").val();
+            var discipline = $("#combobox_discip").val();
+            var search_str = "";
+
+            if (traning_program.length > 0)
+                search_str += traning_program + "/";
+
+            if (discipline.length > 0)
+                search_str += discipline.split(" ").join("+") + "/";
+
+            $.getJSON("filter/" + search_str, function (data) {//отправка запроса
+                var items = [];
+                $("#inlinetablelist").empty();
+                $("#inlinetablelist").append("<tr>\
+                        <th>№</th>\
+                        <th>Направление, квалификация</th>\
+                        <th>Название</th>\
+                        <th>Дата создания</th>\
+                        <th>Дата изменения</th>\
+                        <th>Статус</th>\
+                        <th>Действие</th>\
+                       </tr>");
+
+                for (var i = 0; i < data.length; i++) {
+                    var umk_id = data[i]["id"];
+                    var umk_type = data[i]["type"];
+                    var umk_name = data[i]["name"];
+                    var umk_datetime_create = data[i]["datetime_create"];
+                    var umk_datetime_changed = data[i]["datetime_changed"];
+                    var umk_status = data[i]["status"];
+                    var umk_action;
+                    if (data[i]["status_raw"] == "signaturing" || data[i]["status_raw"] == "confirmed")
+                        umk_action = "Нет действий";
+                    else {
+                        umk_action = "<a href=\"/umk/edit/" + umk_id + "\">Изменить</a>";
+                    }
+
+                    $("#inlinetablelist").append("<tr> \
+                            <th><input type=\"checkbox\" value=\"" + umk_id + "\" title=\"id:" + umk_id + "\"></th>\
+                            <th>" + umk_type + "</th> \
+                            <th>" + umk_name + "</th> \
+                            <th>" + umk_datetime_create + "</th> \
+                            <th>" + umk_datetime_changed + "</th> \
+                            <th>" + umk_status + "</th> \
+                            <th>" + umk_action + "</th> \
+                      </tr>"
+                    );
+                }
+                console.log("success");
+                $("#button_add_to_table").prop("disabled", false);
+            })
+                .fail(function () {
+                    alert('По вашему запросу ничего не найдено!');
+                    $("#button_add_to_table").prop("disabled", true);
+                });
+        }
+
+        window.onload=function(){
+            filter_changed();
+        }
+
+
+        $("#combobox_tp").change(function() {
+            filter_changed();
+        });
+
+        $("#combobox_discip").change(function() {
+            filter_changed();
+        });
+
+
+
         $('#btn_delete').click(function(){
                 var list = [];
                 $('input:checkbox:checked').each(function(){

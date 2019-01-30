@@ -1,0 +1,44 @@
+/* combobox = sélecteur description famille */
+
+.container-combobox {
+	width: 1024px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 25px;
+}
+
+.custom-combobox {
+	position: relative;
+}
+
+.container-combobox label {
+	padding-left: 0;
+	font-size: 14px;
+}
+
+.custom-combobox a {
+	position: absolute;
+	right: 10px;
+}
+
+.custom-combobox a:hover {
+	cursor: pointer;
+}
+
+.custom-combobox-input {
+	width: 20em;
+}
+
+.ui-autocomplete {
+	max-height: 300px;
+	overflow-y: auto;
+	width: 20em;
+	overflow-x: hidden;
+	/* pour avoir un nombre limité de résultats, et scroller si beaucoup de résultats*/
+
+}
+
+.container-combobox .ui-button-text-only, .container-combobox .ui-button-text	{
+	border: none;
+	padding: 0;
+}

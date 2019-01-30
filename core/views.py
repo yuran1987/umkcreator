@@ -71,19 +71,41 @@ def showUmkList(request):
     table = []
     obj = UmkArticles.objects.filter(creator=request.user)
     for a in obj:
-        plan = Plans.objects.get(id = a.plan_ochka)
-        table.append({'id': a.id,
-                      'type': "{0}, {1} {2}а".format(plan.direction, plan.get_training_program_display(), plan.get_qualif_display()),
-                      'name': plan.discipline.name,
-                      'datetime_create': a.datetime_created.strftime("%d/%b/%Y %H:%M:%S"),
-                      'datetime_changed': a.datetime_changed.strftime("%d/%b/%Y %H:%M:%S"),
-                      'status':a.get_status_display(),
-                      'status_raw': a.status
-                  })
+        tmp = {'name': Plans.objects.get(id = a.plan_ochka).discipline.name}
+        if tmp not in table:
+            table.append(tmp)
 
-    return render(request, 'umklist.html', {'title': settings.SITE_NAME, 'umk_list': table})
+    return render(request, 'umklist.html', {'title': settings.SITE_NAME, 'discipline_list': table})
 
+def showUmkList_filters(request, training_program="", discipl=""):
+    table = []
+    obj = UmkArticles.objects.filter(creator=request.user)
+    for a in obj:
+        plan = Plans.objects.get(id=a.plan_ochka)
+        isAdd = False
+        if len(training_program)>0 and len(discipl)>0:
+            discipl = discipl.replace("+", " ")
+            if plan.training_program == training_program and re.search(discipl.lower(), plan.get_discipline().lower()):
+                isAdd = True
+        elif training_program:
+            if plan.training_program == training_program:
+                isAdd = True
+        else:
+            isAdd = True
 
+        if isAdd:
+            table.append({'id': a.id,
+                          'type': "{0}, {1} {2}а".format(plan.direction, plan.get_training_program_display(), plan.get_qualif_display()),
+                          'name': plan.discipline.name,
+                          'datetime_create': a.datetime_created.strftime("%d/%b/%Y %H:%M:%S"),
+                          'datetime_changed': a.datetime_changed.strftime("%d/%b/%Y %H:%M:%S"),
+                          'status':a.get_status_display(),
+                          'status_raw': a.status
+                      })
+
+    response = JsonResponse(table,safe=False,charset='utf-8')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 #------------------------------------------Работа с учебными планами----------------------------------------------------
 def uploadplan(request): #загрузка учебного плана
