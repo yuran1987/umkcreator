@@ -2,7 +2,7 @@
 {% block header_settings %}
 <style>
     #umk_core_content {
-        padding-top: 100px;
+        padding-top: 15%;
     }
     #panel {
         height: 100px;
@@ -18,17 +18,20 @@
                 <div class="col-sm-12">
                     <div class="page-header">
                         <center>
-                        <h5>Комплект оценочных средств:</h5>
+                            <h4><b>{{ discipline }} <<{{ direction }}>></b></h4>
+                            <h5>{{ profiles }}:</h5>
+                            <h5>Год набора: {{ umk.year }}</h5>
+                            <h5><b>Комплект оценочных средств:</b></h5>
                         </center>
                     </div>
                 </div>
             </div>
             <div id="list_actionstable">
                 <ol>
-                 <li><a href="{% url 'umk_edit_menu' umk_id %}">Назад</a></li>
+                 <li><a href="{% url 'umk_edit_menu' umk.id %}">Назад</a></li>
                  {% if actions_list %}
                     {% for act in actions_list %}
-                        <li><a href="{% url act.url umk_id %}">{{ act.name }}</a></li>
+                        <li><a href="{% url act.url umk.id %}">{{ act.name }}</a></li>
                     {% endfor %}
                 {% else %}
                     <li>Извините, но действий для КОСов отсутствуют.</li>

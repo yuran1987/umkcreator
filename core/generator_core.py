@@ -89,20 +89,26 @@ def get_competens(plan):
 
 def get_zaf_kaf(deparmt):#получаем ФИО зав кафедрой
     user = User.objects.filter(deparmt=deparmt)
-    res = {"name": '', "position": ''}
+    res = {"name": '', "position": '', 'science_stepen':'', 'science_zvanie':''}
 
     for u in user:
         if u.position == "io_zaf_kaf" or u.position == "zaf_kaf":
-            res = {'name': "{0} {1}. {2}.".format(u.last_name, u.first_name[0], u.patronymic[0]),   'position': u.get_position_display()}
+            res = {'name': "{0} {1}. {2}.".format(u.last_name, u.first_name[0], u.patronymic[0]),
+                   'position': u.get_position_display().capitalize(),
+                   'science_stepen':u.get_science_stepen_display(),
+                   'science_zvanie':u.get_science_zvanie_display()}
 
     return res
 
 def get_predsedatel_spn(deparmt):#председатель СПН
     user = User.objects.filter(deparmt=deparmt)
-    res = ''
+    res = {'fio':'', 'position': ''}
     for u in user:
-        if u.position == "predsedatel_spn":
-            res = "{0} {1}. {2}.".format(u.last_name, u.first_name[0], u.patronymic[0])
+        if u.position == "predsedatel_spn" or u.position == "predsedatel_ksn":
+            pos = u.get_position_display().split()
+            pos[0] = pos[0].capitalize()
+            pos = " ".join(pos)
+            res = {'fio': "{0} {1}. {2}.".format(u.last_name, u.first_name[0], u.patronymic[0]), 'position': pos}
 
     return res
 

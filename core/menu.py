@@ -21,7 +21,8 @@ class CustomMenu(Menu):
         self.children += [
             items.MenuItem(('Dashboard'), reverse('admin:index')),
             items.ModelList('Данные университета',
-                [ 'core.models.Univercity',
+                [ 'core.models.Ministerstvo',
+                  'core.models.Univercity',
                   'core.models.Units',
                   'core.models.Departaments',
                 ]

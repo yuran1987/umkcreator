@@ -401,6 +401,11 @@ class PlanImport(object):#Класс для импорта учебного пл
                 tmp.save()
 
         if self.type_edu==TypeEduPlan.FULLTIME:
+            #for j in range(1, 5):
+            #    for i in range(1, self.ws.max_row):
+            #        if re.search("план\s*учебного\s*процесса", str(self.ws.cell(row=i, column=j).value).lower()):
+            #            print("res col=",i," row=",j)
+
             num_cols = [2,34]
             num_rows = [32,40]
         elif self.type_edu==TypeEduPlan.EXTRAMURAL:

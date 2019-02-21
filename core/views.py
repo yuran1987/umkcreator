@@ -1,15 +1,15 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, get_object_or_404
 from django.utils import timezone
 from django.http import Http404, JsonResponse
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, FormView
 from django.contrib.auth import get_user_model
 from tempfile import NamedTemporaryFile
 import re, json
 from .forms import SelectDisipForm,SelectPlanForm,addDatafor_core, addDatafor_addons_form, rating_form, UploadFilePlanForm, literature_form, UploadFileCompetenceForm, UserFormEdit,Umkcopy_form, form_kos
 from .import_plans import PlanImport, TypeEduPlan
-from .models import UmkArticles,Plans, UmkData, User
+from .models import UmkArticles,Plans, UmkData, User, Ministerstvo, Univercity
 from .docxpdf_generator import generation_docx, generation_docx_achive
 from .getsysinfo import get_os_info, get_cpu_info,get_meminfo,get_django_version,get_ip_address_server,get_ip_client, get_cpu_cores
 from .search_lit import get_lit_urait_json, get_lit_lanbook_json
@@ -54,15 +54,26 @@ class UserProfileDetailView(DetailView):
         return user
 
 class UserProfileEditView(UpdateView):
-    model = get_user_model()
-    form_class = UserFormEdit
-    template_name = "registration/profile_edit.html"
+     model = get_user_model()
+     form_class = UserFormEdit
+     template_name = "registration/profile_edit.html"
 
-    def get_object(self,queryset=None):
-        return self.request.user
+     def get_object(self,queryset=None):
+         return self.request.user
 
-    def get_success_url(self):
-        return reverse("profile", kwargs={"slug": self.request.user})
+     def form_valid(self, form):
+         form.save(first_name = form.cleaned_data['first_name'],
+                   last_name = form.cleaned_data['last_name'],
+                   patronymic = form.cleaned_data['patronymic'],
+                   birthday = form.cleaned_data['birthday'],
+                   deparmt = form.cleaned_data['deparmt'],
+                   position = form.cleaned_data['position'],
+                   science_stepen = form.cleaned_data['science_stepen'],
+                   science_zvanie = form.cleaned_data['science_zvanie'],
+                   electronic_signature = form.cleaned_data['electronic_signature'],
+                   email = form.cleaned_data['email'],
+                   sets = form.cleaned_data['sets'])
+         return HttpResponseRedirect(reverse("profile", kwargs={"slug": self.request.user}))
 
 def User_password_changed(request):
     return render(request, 'registration/password_change_done.html', {'title': settings.SITE_NAME})
@@ -75,6 +86,8 @@ def showUmkList(request):
         if tmp not in table:
             table.append(tmp)
 
+    table.sort(key=lambda d: d['name'])
+
     return render(request, 'umklist.html', {'title': settings.SITE_NAME, 'discipline_list': table})
 
 def showUmkList_filters(request, training_program="", discipl=""):
@@ -85,7 +98,7 @@ def showUmkList_filters(request, training_program="", discipl=""):
         isAdd = False
         if len(training_program)>0 and len(discipl)>0:
             discipl = discipl.replace("+", " ")
-            if plan.training_program == training_program and re.search(discipl.lower(), plan.get_discipline().lower()):
+            if (plan.training_program == training_program) and (discipl.lower() == plan.get_discipline().lower()):
                 isAdd = True
         elif training_program:
             if plan.training_program == training_program:
@@ -97,6 +110,7 @@ def showUmkList_filters(request, training_program="", discipl=""):
             table.append({'id': a.id,
                           'type': "{0}, {1} {2}а".format(plan.direction, plan.get_training_program_display(), plan.get_qualif_display()),
                           'name': plan.discipline.name,
+                          'year': plan.year,
                           'datetime_create': a.datetime_created.strftime("%d/%b/%Y %H:%M:%S"),
                           'datetime_changed': a.datetime_changed.strftime("%d/%b/%Y %H:%M:%S"),
                           'status':a.get_status_display(),
@@ -127,7 +141,6 @@ def uploadplan(request): #загрузка учебного плана
                            date_prikaz=form.cleaned_data['date_prikaz'],
                            departament=form.cleaned_data['depar'],
                            isUpdate=form.cleaned_data['isUpdate'])
-            print(form.cleaned_data['isUpdate'])
 
             p.import_plan_of_discipline()
             return HttpResponseRedirect(reverse('planlist'))
@@ -183,12 +196,13 @@ def choiseDiscipline(request):
         if form.is_valid():
             return HttpResponseRedirect(reverse('umk_create', kwargs={'id': request.POST['discip_val'],
                                                                       'direct_id': request.POST['direct_val'],
-                                                                      'tr_program': request.POST['training_program']}))
+                                                                      'tr_program': request.POST['training_program'],
+                                                                      'year': request.POST['year']}))
     else:
         form = SelectDisipForm()
     return render(request, 'forms.html', {'title': settings.SITE_NAME, 'form': form, 'title_form': "Создание рабочей программы дисциплины"})
 
-def create_umk(request, dis_id, direct_id, tr_program):
+def create_umk(request, id, direct_id, tr_program, year):
     if request.method == 'POST':
         form = SelectPlanForm(request.POST)
         # check whether it's valid:
@@ -199,9 +213,9 @@ def create_umk(request, dis_id, direct_id, tr_program):
             return HttpResponseRedirect(reverse('showumklist'))
     else:
         form = SelectPlanForm()
-        form.fields['f_plan_ochka'].queryset = Plans.objects.filter(discipline_id=dis_id, direction_id=direct_id, training_form = 'fulltime', training_program = tr_program)
-        form.fields['f_plan_z'].queryset = Plans.objects.filter(discipline_id=dis_id, direction_id=direct_id, training_form = 'extramural', training_program = tr_program)
-        form.fields['f_plan_zu'].queryset = Plans.objects.filter(discipline_id=dis_id, direction_id=direct_id, training_form = 'parttime', training_program = tr_program)
+        form.fields['f_plan_ochka'].queryset = Plans.objects.filter(discipline_id=id, direction_id=direct_id, training_form = 'fulltime', training_program = tr_program, year=year)
+        form.fields['f_plan_z'].queryset = Plans.objects.filter(discipline_id=id, direction_id=direct_id, training_form = 'extramural', training_program = tr_program, year=year)
+        form.fields['f_plan_zu'].queryset = Plans.objects.filter(discipline_id=id, direction_id=direct_id, training_form = 'parttime', training_program = tr_program, year=year)
     return render(request, 'forms.html', {'title': settings.SITE_NAME, 'form': form, 'title_form': "Создание рабочей программы дисциплины"})
 
 def remove_umk(request,id):
@@ -374,12 +388,8 @@ def get_literature_from_url(request, type, search, id=0):
     return response
 
 
-def actions(request, type, id=0, direct_id=0, tr_program=''):
-    if type=='choiseDisp':
-        return choiseDiscipline(request)
-    elif type == 'create':
-        return create_umk(request,dis_id=id, direct_id=direct_id, tr_program=tr_program)
-    elif type == 'editcore':
+def actions(request, type, id=0):
+    if type == 'editcore':
         return DataForUmk_core(request, id)
     elif type == 'actlist':
         umk = UmkArticles.objects.get(id=id)
@@ -401,7 +411,7 @@ def actions(request, type, id=0, direct_id=0, tr_program=''):
                                                          'direction': plans[0].get_direction(),
                                                          'profiles': plans[0].get_profiles(),
                                                          'actions_list': act,
-                                                         'umk_id':id})
+                                                         'umk':{'id':id, 'year':plans[0].year}})
 
 
 ###################################################################################################################
@@ -439,40 +449,50 @@ def kos_menu(request, id):
     js = json.JSONDecoder()
     lmenu = []
 
-    for item in js.decode(umkdata.table_rating_ochka):
-        if re.search("тестиров", item[1].lower()):
-            lmenu.append({'url':"kos_cur_control", 'name':'Типовые задания для текущего контроля'})
-        elif re.search("лаборат", item[1].lower()):
-            lmenu.append({'url': "kos_labs", 'name': 'Комплект заданий для лабораторной работы'})
-        elif re.search("практ", item[1].lower()):
-            lmenu.append({'url': "kos_prakt", 'name': 'Комплект заданий для практической работы'})
-        elif re.search("контрол", item[1].lower()):
-            lmenu.append({'url': "kos_kontr_work", 'name': 'Комплект заданий для контрольной работы'})
-        elif re.search("реферат", item[1].lower()):
-            lmenu.append({'url': "kos_referat", 'name': 'Темы рефератов'})
-        elif re.search("эссе", item[1].lower()):
-            lmenu.append({'url': "kos_referat", 'name': 'Темы эссе'})
-        elif re.search("доклад", item[1].lower()):
-            lmenu.append({'url': "kos_referat", 'name': 'Темы докладов'})
-        elif re.search("задач", item[1].lower()):
-            lmenu.append({'url': "kos_zadachi", 'name': 'Комплект разноуровневых заданий (задач)'})
+    def search_rating(item):
+        if re.search("тестиров", item):
+            return {'url':"kos_cur_control", 'name':'Типовые задания для текущего контроля'}
+        elif re.search("лаборат", item):
+            return {'url': "kos_labs", 'name': 'Комплект заданий для лабораторной работы'}
+        elif re.search("практ", item):
+            return {'url': "kos_prakt", 'name': 'Комплект заданий для практической работы'}
+        elif re.search("контрол", item):
+            return {'url': "kos_kontr_work", 'name': 'Комплект заданий для контрольной работы'}
+        elif re.search("реферат", item):
+            return {'url': "kos_referat", 'name': 'Темы рефератов'}
+        elif re.search("эссе", item):
+            return {'url': "kos_referat", 'name': 'Темы эссе'}
+        elif re.search("доклад", item):
+            return {'url': "kos_referat", 'name': 'Темы докладов'}
+        elif re.search("задач", item):
+            return {'url': "kos_zadachi", 'name': 'Комплект разноуровневых заданий (задач)'}
 
-    plan = Plans.objects.get(id = umkdata.umk_id.plan_ochka)
-    if plan.exam_semestr:
+
+    for item in js.decode(umkdata.table_rating_ochka):
+        res = search_rating(item[1].lower())
+        if (res not in lmenu) and res:
+            lmenu.append(res)
+
+    for item in js.decode(umkdata.table_rating_zaochka):
+        res = search_rating(item[1].lower())
+        if (res not in lmenu) and res:
+            lmenu.append(res)
+
+    plans = [ Plans.objects.get(id = umkdata.umk_id.plan_ochka),
+              Plans.objects.get(id=umkdata.umk_id.plan_z),
+              Plans.objects.get(id=umkdata.umk_id.plan_zu)
+              ]
+    if plans[0].exam_semestr or plans[1].exam_semestr or plans[2].exam_semestr:
         lmenu.append({'url': "kos_vorosy_exam", 'name': 'Вопросы к экзамену'})
-    if plan.zachot_semestr:
+    if plans[0].zachot_semestr or plans[1].zachot_semestr or plans[2].zachot_semestr:
         lmenu.append({'url': "kos_vorosy_zachot", 'name': 'Вопросы к зачету'})
 
-
-    llmenu = []
-    for item in lmenu:
-        if item not in llmenu:
-            llmenu.append(item)
-
-
     return render(request, 'kos_menu.html', {'title': settings.SITE_NAME,
-                                                     'actions_list': llmenu,
-                                                     'umk_id': id})
+                                                     'actions_list': lmenu,
+                                                     'discipline': plans[0].discipline.name,
+                                                     'direction': plans[0].get_direction(),
+                                                     'profiles': plans[0].get_profiles(),
+                                                     'umk': {'id': id, 'year': plans[0].year}})
 #######################################################################################################################
 #
 #
@@ -567,3 +587,19 @@ def get_document_in_archive(request,id_list,format):
         return HttpResponse('Document format {0}'.format(format))
     else:
         return HttpResponse('Document unknown format {0}'.format(format))
+
+
+
+def zapolnenie(request): #Заполнение в учебном плане 2016 года нзвания университета и министерства
+
+    for item in Plans.objects.all():
+        if item.year==2014 or item.year==2015:
+            item.ministerstvo = Ministerstvo.objects.get(name="Министерство образования и науки РФ")
+            item.univer = Univercity.objects.get(name='Федеральное государственное бюджетное образовательное учреждение высшего профессионального образования "Тюменский государственный нефтегазовый университет"')
+            item.save()
+        elif item.year==2016 or item.year==2017:
+             item.ministerstvo = Ministerstvo.objects.get(name="Министерство образования и науки РФ")
+             item.univer = Univercity.objects.get(name='Федеральное государственное бюджетное образовательное учреждение высшего образования "Тюменский индустриальный университет"')
+             item.save()
+
+    return JsonResponse({'res': 'OK'})

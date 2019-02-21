@@ -14,6 +14,15 @@
         </div>
         <div id="profile_list1">
         {% csrf_token %}
+        {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <strong>{{ error|escape }}: {{ field.name}}</strong><br />
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+        {% endif %}
         {% crispy form %}
         </div>
     </div>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Discipline, Directions, Profiles, Plans, Univercity,Departaments,Units,UmkArticles, UmkData,Competence, User
+from .models import Ministerstvo, Discipline, Directions, Profiles, Plans, Univercity,Departaments,Units,UmkArticles, UmkData,Competence, User
 
 # Register your models here.
 class ProfilesAdmin(admin.ModelAdmin):
@@ -28,6 +28,7 @@ admin.site.register(Competence,CompetentceAdmin)
 admin.site.register(Profiles,ProfilesAdmin)
 admin.site.register(Plans,PlansAdmin)
 admin.site.register(Univercity)
+admin.site.register(Ministerstvo)
 admin.site.register(Departaments)
 admin.site.register(Units)
 admin.site.register(UmkArticles)

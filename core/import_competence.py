@@ -22,7 +22,7 @@ class CompetenceImport(object):
                 for cell in row.cells:
                     if str(cell.text) == u'Вид профессиональной деятельности':
                         wtable_prof_deyat = table
-                    elif str(cell.text) == u'Уровень сформированности компетенции':
+                    elif str(cell.text) == u'Уровень сформированности компетенции' or str(cell.text) == u'Уровни сформированности компетенции':
                         wtable_lev_copeten = table
                 break
 

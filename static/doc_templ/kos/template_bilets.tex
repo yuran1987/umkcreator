@@ -1,0 +1,69 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+\def\KAFstr#1{\gdef\KAFstr{#1}}%название кафедры
+\def\DISstr#1{\gdef\DISstr{#1}}%название дисциплины
+\def\FIOp#1{\gdef\FIOp{#1}}%фамилия и инициалы преподавателя
+\def\FIOz#1{\gdef\FIOz{#1}}%фамилия и инициалы заведующего кафедрой
+\def\DAT#1{\gdef\DAT{#1}}%дата создания билетов
+
+\newcounter{nbilet}
+\newcommand{\BILET}{\par\addtocounter{nbilet}{1}%
+\textbf{\bfseries ЭКЗАМЕНАЦИОННЫЙ БИЛЕТ №\,\arabic{nbilet}}}
+
+\newcommand{\printbilet}[3]{
+\par
+\begin{tabular}{|cc|}
+\hline
+\begin{minipage}[c][5cm][c]{0.46\textwidth}
+\centering\footnotesize{
+\bfseries \VAR{Ministerstvo}\\%[5pt]
+\bfseries \VAR{Univercity}}\\
+\bfseries \scriptsize{\VAR{Units}}
+\end{minipage}
+&
+\begin{minipage}{0.50\textwidth}
+\small
+\textbf{Кафедра:}~\KAFstr\\
+\textbf{Дисциплина:}~\DISstr
+\end{minipage}\\
+\multicolumn{2}{|c|}{\BILET}\\
+\multicolumn{2}{|c|}
+{\begin{minipage}[t][4cm][c]{0.95\textwidth}
+\begin{enumerate}
+\item #1
+\ifx&#2&
+%empty
+\else
+\item #2
+\fi
+\ifx&#3&%
+%empty
+\else
+\item #3
+\fi
+\end{enumerate}
+\end{minipage}}\\
+\multicolumn{2}{|c|}
+{\begin{minipage}[t][2.2cm][c]{0.95\textwidth}
+Заведующий кафедрой\underline{\hspace{3cm}}\FIOz\\[5pt]
+Утверждено \DAT
+\end{minipage}}\\
+\hline
+\end{tabular}
+\vspace{-3.1pt}}
+
+\KAFstr{<<\VAR{kafedra}>>}
+\DISstr{\VAR{discipline}}
+\FIOz{\VAR{zaf_kaf.academic_degree}, \VAR{zaf_kaf.academic_zvanie} \textbf{\VAR{zaf_kaf.fio}}}
+\DAT{\VAR{date.day}.\VAR{date.month}.\VAR{date.year}~г.}
+
+\begin{document}
+\centering
+\BLOCK{ for item in list_q }
+\printbilet{\VAR{item.first}}{\VAR{item.two}}{}
+\BLOCK{endfor}
+\end{document}

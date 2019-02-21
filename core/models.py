@@ -7,9 +7,18 @@ from .core_funcs import getSemestrs_1d, TRANING_PROGRAMS, QUALIFICATION_VALUES
 # Create your models here.
 #----------------------------------------------------------------------------------------------------------------------
 #Информация о университете и подразделениях
+class Ministerstvo(models.Model):
+    name = models.CharField(primary_key=True, max_length=255, verbose_name=u'Министерство',default=u'Министерство науки и высшего образования РФ')
+
+    class Meta:
+        verbose_name = u'Министерство'
+        verbose_name_plural = u'Список министерств'
+
+    def __str__(self):
+        return self.name
+
 class Univercity(models.Model):
     name = models.CharField(primary_key=True,max_length=255, verbose_name=u'Название университета')
-    ministerstvo = models.CharField(max_length=255, verbose_name=u'Министерство', default=u'Министерство науки и высшего образования РФ')
 
     class Meta:
         verbose_name = u'Университет'
@@ -107,7 +116,8 @@ class Plans(models.Model):  # Учебный план
         ['extramural', u'Заочная (5 лет)'],
         ['parttime', u'Заочная (3.5 года)']
     )
-
+    ministerstvo = models.ForeignKey(Ministerstvo, null=True, on_delete=models.CASCADE, verbose_name=u'Название министерства')
+    univer = models.ForeignKey(Univercity, null=True, on_delete=models.CASCADE, verbose_name=u'Название университета')
     code_OPOP = models.CharField(max_length=15, verbose_name=u'Код ОПОП')  # Код ОПОП
     discipline = models.ForeignKey(Discipline, null=True, on_delete=models.CASCADE, verbose_name=u'Название дисциплины')  # Дисциплина
     profile = models.ManyToManyField(Profiles, verbose_name=u'Профиль')  # Профиль
@@ -293,7 +303,7 @@ class User(AbstractUser):
                  ['proffessor', 'проф.'],
                  ['docent', 'доц.'],
                  ['zaf_kaf', 'зав.каф.'],
-                 ['io_zaf_kaf', 'И.о. зав.каф.'],
+                 ['io_zaf_kaf', 'и.о. зав.каф.'],
                  ['ved_spec', 'вед.спец.'],
                  ['glav_red', 'гл.ред.'],
                  ['glav_spec', 'гл.спец.'],
@@ -315,6 +325,7 @@ class User(AbstractUser):
                  ['tehnik', 'техн.'],
                  ['uch_sekretar', 'уч.секр.'],
                  ['predsedatel_spn', 'председатель СПН'],
+                 ['predsedatel_ksn', 'председатель КСН'],
      )
 
      sci_stepen_schoises = ( #Сокращения учёных степеней и званий (в соответствии с рекомендациями Министерство Образования и Науки РФ)
@@ -378,6 +389,7 @@ class User(AbstractUser):
      science_stepen = models.CharField(choices=sci_stepen_schoises, default="k_teh_n", max_length=255,verbose_name="Ученая степень")
      science_zvanie = models.CharField(choices=sci_zvaniya, default='no', max_length=255,verbose_name="Ученое звание")
      electronic_signature = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name=u'Электронная подпись')
+     sets = models.CharField(blank = True, null=True, max_length=255, verbose_name="Настройки")
 
      def get_patronymic(self):
         return self.patronymic

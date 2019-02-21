@@ -22,7 +22,7 @@
 
         #inlinetablelist{
             overflow-y: scroll;
-            height: 350px;
+            height: 600px;
             position: absolute;
         }
 
@@ -35,7 +35,7 @@
         }
 
         #buttons {
-            margin-top: 350px;
+            margin-top: 600px;
             position: absolute;
         }
     </style>
@@ -68,7 +68,7 @@
                             <select id="combobox_discip" style="width:200px;">
                                 <option value=""></option>
                                 {% for d in discipline_list %}
-                                <option value={{ d.name }}>{{ d.name }}</option>
+                                <option value="{{ d.name }}">{{ d.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -105,8 +105,10 @@
             if (traning_program.length > 0)
                 search_str += traning_program + "/";
 
-            if (discipline.length > 0)
-                search_str += discipline.split(" ").join("+") + "/";
+            if (discipline.length > 0) {
+                search_str += discipline.replace(/ /ig,'+') + "/";
+            }
+
 
             $.getJSON("filter/" + search_str, function (data) {//отправка запроса
                 var items = [];
@@ -115,6 +117,7 @@
                         <th>№</th>\
                         <th>Направление, квалификация</th>\
                         <th>Название</th>\
+                        <th>Год набора</th>\
                         <th>Дата создания</th>\
                         <th>Дата изменения</th>\
                         <th>Статус</th>\
@@ -125,6 +128,7 @@
                     var umk_id = data[i]["id"];
                     var umk_type = data[i]["type"];
                     var umk_name = data[i]["name"];
+                    var umk_year = data[i]["year"];
                     var umk_datetime_create = data[i]["datetime_create"];
                     var umk_datetime_changed = data[i]["datetime_changed"];
                     var umk_status = data[i]["status"];
@@ -139,6 +143,7 @@
                             <th><input type=\"checkbox\" value=\"" + umk_id + "\" title=\"id:" + umk_id + "\"></th>\
                             <th>" + umk_type + "</th> \
                             <th>" + umk_name + "</th> \
+                            <th>" + umk_year + "</th> \
                             <th>" + umk_datetime_create + "</th> \
                             <th>" + umk_datetime_changed + "</th> \
                             <th>" + umk_status + "</th> \

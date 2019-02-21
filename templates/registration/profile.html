@@ -10,17 +10,18 @@
     <div id="content">
         <div id="panel">
             <h1>Профиль</h1>
-            <p>{% if object.username == user.username %}<a href="{% url 'edit_profile' %}">Изменить</a>{% endif %}</p>
-            <p>Имя пользователя: {{ user }}</p>
-            <p>Фамилия: {{ user.first_name }}</p>
-            <p>Имя: {{ user.last_name }}</p>
-            <p>Отчество: {{ user.patronymic }}</p>
-            <p>Email: {{ user.email }}</p>
-            <p>Дата рождения: {{ user.birthday }}</p>
-            <p>Кафедра: {{ user.deparmt }}</p>
-            <p>Должность: {{ user.get_position_display }}</p>
-            <p>Ученая степень: {{ user.get_science_stepen_display }}</p>
-            <p>Ученое звание: {{ user.get_science_zvanie_display }}</p>
+            <p>{% if object.username == user.username %}<a href="{% url 'edit_profile' user.pk %}">Изменить</a>{% endif %}</p>
+            <p><b>Имя пользователя:</b> {{ user }}</p>
+            <p><b>Фамилия:</b> {{ user.first_name }}</p>
+            <p><b>Имя:</b> {{ user.last_name }}</p>
+            <p><b>Отчество:</b> {{ user.patronymic }}</p>
+            <p><b>Email:</b> {{ user.email }}</p>
+            <p><b>Дата рождения:</b> {{ user.birthday }}</p>
+            <p><b>Кафедра:</b> {{ user.deparmt }}</p>
+            <p><b>Должность:</b> {{ user.get_position_display }}</p>
+            <p><b>Ученая степень:</b> {{ user.get_science_stepen_display }}</p>
+            <p><b>Ученое звание:</b> {{ user.get_science_zvanie_display }}</p>
+            <p><b>Настройки:</b> {{ user.sets }}</p>
         </div>
     </div>
 {% endblock %}

@@ -15,6 +15,7 @@ class SelectDisipForm(forms.Form):
     discip_val = forms.ModelChoiceField(queryset=Discipline.objects.all().order_by("name"), help_text=u'Выберете дисциплину', label=u'Дисциплина')
     direct_val = forms.ModelChoiceField(queryset=Directions.objects.all(), help_text=u'Выберете направление', label=u'Направление')
     training_program = forms.ChoiceField(choices=TRANING_PROGRAMS, help_text=u'Выберите программу обучения для специалиста или бакалавра',label=u'Программа обучения')  # Программа обучения
+    year = forms.ChoiceField(choices=([x,x] for x in range(2014,datetime.now().year)), help_text=u'Выберете год набора',label=u'Год набора')
     def __init__(self, *args, **kwargs):
         super(SelectDisipForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
@@ -65,7 +66,7 @@ class addDatafor_core(forms.ModelForm):
                         TabHolder(
                             Tab(u'2.1 Содержание разделов и тем дисциплины',Div(css_id='tablecontentOfSections'), Div('contentOfSections')),
                             Tab(u'2.2 Междициплинарные связи с последующими дисциплинами',Div(css_id='tableinterdiscipRelations'), Div('interdiscipRelations')),
-                            Tab(u'2.3 Разделы (модули), темы дисциплин ви виды занятий', Div(css_id='tablesectionshour',css_class='col-md-auto'), Div('table_sections_hour'),
+                            Tab(u'2.3 Разделы (модули), темы дисциплин виды занятий', Div(css_id='tablesectionshour',css_class='col-md-auto'), Div('table_sections_hour'),
                                 Div(Button('button_calc', 'Рассчитать часы', css_class='btn btn-success', css_id='button_fill_hour_sections'))),
                             Tab(u'2.4 Перечень лекционных занятий', Div(css_id='tablelectureshour', css_class='col-md-auto'), Div('table_lectures_hour'),
                                 Div(Button('button_calc','Рассчитать часы',css_class='btn btn-success', css_id='button_fill_hour_lec'))),
@@ -201,13 +202,6 @@ class form_kos(forms.Form):
 
 
 
-
-
-
-
-
-
-
 ###################
 #Копирование одной рабочей программы в другую
 ###################
@@ -288,11 +282,27 @@ class UserFormEdit(forms.ModelForm):
         self.helper.layout = Layout(
             Row(Div('first_name',css_class="col-md-2"), Div('last_name',css_class="col-md-2"),Div('patronymic',css_class="col-md-2"),Div('birthday', css_class="col-md-2")),
             Row(Div('deparmt', css_class="col-md-2"),  Div('position', css_class="col-md-2"),Div('science_stepen', css_class="col-md-2"), Div('science_zvanie', css_class="col-md-2")),
-            Row(Div('electronic_signature', css_class="col-md-2"),Div('email', css_class="col-md-2")),
-            FormActions(Submit('next', u'Сохранить', css_class="btn-primary", css_id='btn_save'),
+            Row(Div('electronic_signature', css_class="col-md-3"),Div('email', css_class="col-md-3"),Div('sets', css_class="col-md-3")),
+            FormActions(Submit('save', u'Сохранить', css_class="btn-primary", css_id='btn_save'),
                         Submit('cancel', u'Назад'))
         )
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name','last_name','patronymic','birthday','deparmt','position','science_stepen','science_zvanie','electronic_signature', 'username', 'password', 'email']
+        fields = ['first_name','last_name','patronymic','birthday','deparmt','position','science_stepen','science_zvanie','electronic_signature', 'email', 'sets']
+
+    def save(self,first_name, last_name, patronymic, birthday, deparmt, position, science_stepen, science_zvanie, electronic_signature, email, sets):
+        user = super(UserFormEdit, self).save(commit=False)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.patronymic = patronymic
+        user.birthday = birthday
+        user.deparmt = deparmt
+        user.position = position
+        user.science_stepen = science_stepen
+        user.science_zvanie = science_zvanie
+        user.electronic_signature = electronic_signature
+        user.email = email
+        user.sets = sets
+        user.save()
+        return user

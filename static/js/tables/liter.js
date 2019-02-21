@@ -45,7 +45,7 @@ $('#tablejexcel').jexcel({
     ondeleterow:deleterow_lit,
     allowInsertColumn:false,
     columns: [
-              { type: 'numeric' },
+              { type: 'text' },
               { type: 'text', wordWrap:true },
               { type: 'numeric' },
               { type: 'text' },

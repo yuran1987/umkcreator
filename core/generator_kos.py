@@ -1,11 +1,10 @@
-from django.utils.timezone import datetime
-import json,re, os
+import json,re, os, jinja2, pypandoc
 from tempfile import NamedTemporaryFile
 from lxml import etree
 from docxtpl import DocxTemplate, Document
 from django.conf import settings
-from .generator_core import get_competens, get_predsedatel_spn, get_zaf_kaf, required_reconcil, get_table_sections_hours, html_to_docx
-from .models import Plans
+from .generator_core import get_competens, get_predsedatel_spn, get_zaf_kaf, required_reconcil, get_table_sections_hours, html_to_docx, remove_htmk_tags
+from .tex_caller import TexLiveCaller
 #   Создание КОС
 
 def get_text(format_str,list, ending=","):
@@ -45,9 +44,9 @@ def get_type_kos(komplekt_name, kos_id, ministerstvo, univer, unit, author,disci
         'author': {'name': author},
         'Discipline': discipline,
         'contents': html_to_docx(kos[kos_id], sd),
-        'date': date.day,
-        'month': date.month,
-        'year': date.year,
+        'date': date['day'],
+        'month': date['month'],
+        'year': date['year'],
         'komplekt_name': komplekt_name
     }
     sd.render(context)
@@ -55,11 +54,10 @@ def get_type_kos(komplekt_name, kos_id, ministerstvo, univer, unit, author,disci
     sd.save(tp.name)
     return tp
 
-def get_other(doc_tpl, umkdata, ministerstvo, univer, unit, author,discipline):
+def get_other(doc_tpl, umkdata, ministerstvo, univer, unit, author,discipline, date):
     js = json.JSONDecoder()
     if umkdata.kos:
         kos = js.decode(umkdata.kos)
-        date = datetime.now()
         tempfiles_list = []
 
         if kos['reshenie_zadach']:
@@ -112,8 +110,6 @@ def get_other(doc_tpl, umkdata, ministerstvo, univer, unit, author,discipline):
         return ''
 
 def context_KOS(umk, umkdata, plans, doc_tpl):
-    plan = Plans.objects.get(id=umkdata.umk_id.plan_ochka)
-
     #1 Контролируемые компетенции
     tbl_comps = get_competens(plans[0])
 
@@ -150,7 +146,6 @@ def context_KOS(umk, umkdata, plans, doc_tpl):
     js = json.JSONDecoder()
     forms_controlya = set()
     for item in js.decode(umkdata.table_rating_ochka):
-        print(item[1])
         if(re.search("тестиров", item[1].lower())):
             forms_controlya.add("Тестирование ")
         elif re.search("лаборат", item[1].lower()):
@@ -169,11 +164,13 @@ def context_KOS(umk, umkdata, plans, doc_tpl):
         item = tbl_secs[id]
         tbl_control.append({'id': item['id'], 'name': item['name'], 'res': res_obuch, 'indicators': indicators_obuch, 'forms': forms_controlya, 'bal':step_bal})
 
-    context = {'ministerstvo': umk.creator.deparmt.units.univer.ministerstvo,
-               'UNIVERCITY': umk.creator.deparmt.units.univer.name,
+    predsedatel_spn_ksn = get_predsedatel_spn(plans[0].direction.deparmt)
+
+    context = {'ministerstvo': plans[0].ministerstvo.name,
+               'UNIVERCITY': plans[0].univer.name,
                'Units': umk.creator.deparmt.units.name,
                'kafedra': umk.creator.deparmt.name,
-               'predsedatel_spn': get_predsedatel_spn(plans[0].direction.deparmt),
+               'predsedatel_spn': {'fio': predsedatel_spn_ksn['fio'], 'position': predsedatel_spn_ksn['position']},
                'zav_kaf': get_zaf_kaf(umk.creator.deparmt),
                'author': {'name': umk.creator.get_fullname(),
                           'position': umk.creator.get_position_display(),
@@ -183,19 +180,87 @@ def context_KOS(umk, umkdata, plans, doc_tpl):
                'direction': plans[0].get_direction(),
                'Profiles': plans[0].get_profiles(),
                'semestrs': "{0}".format(plans[0].get_semestrs()),
-               'form_attestacii': "экзамен - {0} семестр, зачет - {1} семестр".format(plan.exam_semestr, plan.zachot_semestr) if plan.exam_semestr and plan.zachot_semestr \
-                                                        else 'экзамен - {0} семестр'.format(plan.exam_semestr) if plan.exam_semestr else "зачет - {0} семестр".format(plan.zachot_semestr),
-               'date': datetime.now().day,
-               'month': datetime.now().month,
-               'year': datetime.now().year,
+               'form_attestacii': "экзамен - {0} семестр, зачет - {1} семестр".format(plans[0].exam_semestr, plans[0].zachot_semestr) if plans[0].exam_semestr and plans[0].zachot_semestr \
+                                                        else 'экзамен - {0} семестр'.format(plans[0].exam_semestr) if plans[0].exam_semestr else "зачет - {0} семестр".format(plans[0].zachot_semestr),
+               'date':  "  ",
+               'month': "  ",
+               'year': plans[0].year,
                'zav_kaf_req': required_reconcil(umk.creator, plans),
                'tbl_comps': tbl_comps,
                'tbl_known': tbl_known,
                'tbl_can': tbl_can,
                'tbl_own': tbl_own,
                'tbl_control': tbl_control,
-               'tbl_kursovya_work_project':get_kursovya_table(plan, "{0}-{1}".format(1,str(len(tbl_secs)-1)), res_obuch, doc_tpl),
+               'tbl_kursovya_work_project':get_kursovya_table(plans[0], "{0}-{1}".format(1,str(len(tbl_secs)-1)), res_obuch, doc_tpl),
                'tipovii_zadaniya':html_to_docx(js.decode(umkdata.kos)['tekushii_kontrol'], doc_tpl) if umkdata.kos else 'Не заполнено',
-               'other_zadaniya': get_other(doc_tpl,umkdata,umk.creator.deparmt.units.univer.ministerstvo,umk.creator.deparmt.units.univer.name,umk.creator.deparmt.units.name, umk.creator.get_fullname(), plans[0].get_discipline())
+               'other_zadaniya': get_other(doc_tpl,umkdata,
+                                           plans[0].ministerstvo.name,
+                                           plans[0].univer.name,
+                                           umk.creator.deparmt.units.name,
+                                           umk.creator.get_fullname(),
+                                           plans[0].get_discipline(),
+                                           date={'day':"  ",'month':"  ",'year':plans[0].year})
                }
     return context
+
+
+
+def generation_exam_bilets(umk,umkdata,plans, myzip, directory):
+    #Формирование экзаменационных билетов
+    sets = str(umk.creator.sets)
+    if re.search("bilets",sets): #в настройках включено формирование билетов
+        latex_jinja_env = jinja2.Environment(
+            block_start_string='\BLOCK{',
+            block_end_string='}',
+            variable_start_string='\VAR{',
+            variable_end_string='}',
+            comment_start_string='\#{',
+            comment_end_string='}',
+            line_statement_prefix='%%',
+            line_comment_prefix='%#',
+            trim_blocks=True,
+            autoescape=False,
+            loader=jinja2.FileSystemLoader(os.path.join(settings.BASE_DIR, "static/doc_templ/kos"))
+        )
+        template = latex_jinja_env.get_template('template_bilets.tex')
+        zaf_kav = get_zaf_kaf(plans[0].direction.deparmt)
+
+        js = json.JSONDecoder()
+        if umkdata.kos:
+            kos = js.decode(umkdata.kos)
+            data = kos['voprosy_k_exameny']
+            if data:
+                questions_list = []
+
+                kos_questions = []
+                for item in re.split(r"[\d+]|[\r]|[\n]$",remove_htmk_tags(data)):
+                    if item:
+                        kos_questions.append(item)
+                print(kos_questions)
+
+                for i in range(0,len(kos_questions)-1,2):
+                    if kos_questions[i]!='\r\n':
+                        kos_questions[i] = kos_questions[i].replace('\r\n',"")
+                    if kos_questions[i+1]!='\r\n':
+                        kos_questions[i+1] = kos_questions[i+1].replace('\r\n', "")
+                    if kos_questions[i] and kos_questions[i+1]:
+                        questions_list.append({'first': kos_questions[i].lstrip(), 'two':kos_questions[i+1].lstrip()})
+                print(questions_list)
+                if questions_list:
+                    template_vars = {'Ministerstvo': plans[0].ministerstvo.name,
+                                     'Univercity': plans[0].univer.name,
+                                     'Units': umk.creator.deparmt.units.name,
+                                     'kafedra': umk.creator.deparmt.name,
+                                     'discipline': plans[0].get_discipline(),
+                                     'zaf_kaf': {'fio': zaf_kav['name'], 'academic_degree': zaf_kav['science_stepen'], 'academic_zvanie': zaf_kav['science_zvanie']+',' if zaf_kav['science_zvanie']!='без ученого звания' else ''},
+                                     'date': {'day': '\_\_', 'month': '\_\_', 'year': plans[0].year},
+                                     'list_q': questions_list
+                                     }
+
+                    # create a file and save the latex
+                    rp_file_object = NamedTemporaryFile(prefix="{0}-{1}-".format(plans[0].discipline,'экзаменационные билеты'), suffix='.pdf',dir=directory)  # create temp file
+                    #pypandoc.convert(template.render(template_vars), 'pdf', format='latex', outputfile=rp_file_object.name, extra_args=['--latex-engine=pdflatex'])
+                    t = TexLiveCaller(fnameout=rp_file_object.name)
+                    myzip.write(t.latex2pdf(template.render(template_vars)))
+                    #myzip.write(rp_file_object.name)
+                    rp_file_object.close()

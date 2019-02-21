@@ -1,13 +1,13 @@
-import os,re
+import os,re, shutil
 from io import BytesIO
 from zipfile import ZipFile
 from django.http import HttpResponse
 from django.utils.timezone import datetime
 from django.conf import settings
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory, gettempdir
 from docxtpl import DocxTemplate, RichText
 from .models import Plans, UmkArticles, UmkData, Competence, User
-from .generator_kos import context_KOS
+from .generator_kos import context_KOS, generation_exam_bilets
 from .generator_core import get_predsedatel_spn, get_zaf_kaf, get_course, isEmptyValOrStr, get_hour_kursovaya_work_or_project, required_reconcil, html_to_docx, \
             get_OPOP_of_discipline, get_placeInStructOPOP,get_competens,get_table_contentsection,get_table_interdisciplinary_relations, get_table_sections_hours, \
             get_table_lections_hours,get_table_labs_prakt, get_table_samost_hours, get_table_literature, get_table_rating_day, get_table_rating_night, isEmptyVal
@@ -24,12 +24,13 @@ from .generator_core import get_predsedatel_spn, get_zaf_kaf, get_course, isEmpt
 def context_workprogram(umk, umkdata, plans, doc_tpl):
     dateprikaz = plans[0].get_direction_date_prikaz()
     kursovya_work_project_sem = [re.findall("\d+",plan.kursovya_work_project)[0] for plan in plans if re.findall("\d+",plan.kursovya_work_project)] #номер семестра на курсовой проект
+    predsedatel_spn_ksn = get_predsedatel_spn(plans[0].direction.deparmt)
 
-    context = {'ministerstvo': umk.creator.deparmt.units.univer.ministerstvo,
-               'UNIVERCITY': umk.creator.deparmt.units.univer.name,
+    context = {'ministerstvo': plans[0].ministerstvo,#umk.creator.deparmt.units.univer.ministerstvo,
+               'UNIVERCITY': plans[0].univer,
                'Units': umk.creator.deparmt.units.name,
                'kafedra': umk.creator.deparmt.name,
-               'predsedatel_spn': get_predsedatel_spn(plans[0].direction.deparmt),
+               'predsedatel_spn': {'fio': predsedatel_spn_ksn['fio'], 'position': predsedatel_spn_ksn['position']},
                'zav_kaf': get_zaf_kaf(umk.creator.deparmt),
                'author': {'name': umk.creator.get_fullname(),
                           'position': umk.creator.get_position_display(),
@@ -57,17 +58,17 @@ def context_workprogram(umk, umkdata, plans, doc_tpl):
                'raschotno_graph_work_semests': "-",
                'raschotno_graph_work_hours': "-",
                'zanyatiya_in_interaktiv_hours': "{0}".format(plans[0].zanatiya_in_interak_forms_hours),
-               'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if len(plans[0].zachot_semestr.split(','))>1 else isEmptyVal(plans[0].zachot_semestr),
-                                                       plans[1].zachot_semestr if len(plans[1].zachot_semestr.split(',')) > 1 else isEmptyVal(plans[1].zachot_semestr),
-                                                       plans[2].zachot_semestr if len(plans[2].zachot_semestr.split(',')) > 1 else isEmptyVal(plans[2].zachot_semestr)),
-               'exam_semestrs': "{0}/{1}/{2}".format(plans[0].exam_semestr if len(plans[0].exam_semestr.split(','))>1 else isEmptyVal(plans[0].exam_semestr),
-                                                       plans[1].exam_semestr if len(plans[1].exam_semestr.split(',')) > 1 else isEmptyVal(plans[1].exam_semestr),
-                                                       plans[2].exam_semestr if len(plans[2].exam_semestr.split(',')) > 1 else isEmptyVal(plans[2].exam_semestr)),
+               'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if plans[0].zachot_semestr else isEmptyVal(plans[0].zachot_semestr),
+                                                       plans[1].zachot_semestr if plans[1].zachot_semestr else isEmptyVal(plans[1].zachot_semestr),
+                                                       plans[2].zachot_semestr if plans[2].zachot_semestr else isEmptyVal(plans[2].zachot_semestr)),
+               'exam_semestrs': "{0}/{1}/{2}".format(plans[0].exam_semestr if plans[0].exam_semestr else isEmptyVal(plans[0].exam_semestr),
+                                                       plans[1].exam_semestr if plans[1].exam_semestr else isEmptyVal(plans[1].exam_semestr),
+                                                       plans[2].exam_semestr if plans[2].exam_semestr else isEmptyVal(plans[2].exam_semestr)),
                'trudoemkost_all': "{0}".format(plans[0].trudoemkost_all),
                'zachot_edinic': "{0}".format(plans[0].trudoemkost_zachot_edinic),
                'prikaz_number': dateprikaz[0],
                'prikaz_date': dateprikaz[1].strftime("%d.%m.%Y"),
-               'year': datetime.now().strftime("%Y"),
+               'year': plans[0].year,
                'zav_kaf_req': required_reconcil(umk.creator, plans),
                # -------------------------------------------------------------------------------------------------------
                'discipline_aims':  html_to_docx(umkdata.aim, doc_tpl),
@@ -133,12 +134,12 @@ def context_annotation(umk, umkdata, plans, doc_tpl):
                'samost_total_hours': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,
                                                           plans[1].hours_samost_work_sum,
                                                           plans[2].hours_samost_work_sum),
-               'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if len(plans[0].zachot_semestr.split(','))>1 else isEmptyVal(plans[0].zachot_semestr),
-                                                       plans[1].zachot_semestr if len(plans[1].zachot_semestr.split(',')) > 1 else isEmptyVal(plans[1].zachot_semestr),
-                                                       plans[2].zachot_semestr if len(plans[2].zachot_semestr.split(',')) > 1 else isEmptyVal(plans[2].zachot_semestr)),
-               'exam_semestrs': "{0}/{1}/{2}".format(plans[0].exam_semestr if len(plans[0].exam_semestr.split(','))>1 else isEmptyVal(plans[0].exam_semestr),
-                                                       plans[1].exam_semestr if len(plans[1].exam_semestr.split(',')) > 1 else isEmptyVal(plans[1].exam_semestr),
-                                                       plans[2].exam_semestr if len(plans[2].exam_semestr.split(',')) > 1 else isEmptyVal(plans[2].exam_semestr)),
+               'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if plans[0].zachot_semestr else isEmptyVal(plans[0].zachot_semestr),
+                                                       plans[1].zachot_semestr if plans[1].zachot_semestr else isEmptyVal(plans[1].zachot_semestr),
+                                                       plans[2].zachot_semestr if plans[2].zachot_semestr else isEmptyVal(plans[2].zachot_semestr)),
+               'exam_semestrs': "{0}/{1}/{2}".format(plans[0].exam_semestr if plans[0].exam_semestr else isEmptyVal(plans[0].exam_semestr),
+                                                       plans[1].exam_semestr if plans[1].exam_semestr else isEmptyVal(plans[1].exam_semestr),
+                                                       plans[2].exam_semestr if plans[2].exam_semestr else isEmptyVal(plans[2].exam_semestr)),
                'trudoemkost_all': "{0}".format(plans[0].trudoemkost_all),
                'year_nabor': plans[0].year,
                # -------------------------------------------------------------------------------------------------------
@@ -155,9 +156,9 @@ def context_annotation(umk, umkdata, plans, doc_tpl):
 
 
 
-def render_in_docx(document,context, umkname, save_tozip):
+def render_in_docx(document,context, umkname, save_tozip,directory):
     document.render(context)
-    rp_file_object = NamedTemporaryFile(prefix="{0}-".format(umkname), suffix='.docx')  # create temp file
+    rp_file_object = NamedTemporaryFile(prefix="{0}-".format(umkname), suffix='.docx', dir=directory)  # create temp file
     document.save(rp_file_object.name)
     save_tozip.write(rp_file_object.name)
     rp_file_object.close()
@@ -172,21 +173,32 @@ def generation_docx(id):#формирование только одной раб
     ]
     umkname = umk.get_short_name()  # имя дисциплины и профиль
 
+    tmpdir = gettempdir()
+    dir_path = "{0}/{1}/{2}/{3}".format(tmpdir, plans[0].year,
+                                        "{0} {1}".format(plans[0].get_training_program_display(),
+                                                         plans[0].get_qualif_display()),
+                                        plans[0].discipline)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
     tmpfile = BytesIO()
     with ZipFile(tmpfile, 'w') as myzip:
         ####создание рабочей программы
         doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_work_program.docx'))
-        render_in_docx(doc, context_workprogram(umk, umkdata, plans, doc), umkname, myzip)
+        render_in_docx(doc, context_workprogram(umk, umkdata, plans, doc), umkname, myzip, dir_path)
 
         # создание аннотации
         ann_doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_annotation.docx'))
-        render_in_docx(ann_doc, context_annotation(umk, umkdata, plans, ann_doc), "{0}-аннотация".format(umkname), myzip)
+        render_in_docx(ann_doc, context_annotation(umk, umkdata, plans, ann_doc), "{0}-аннотация".format(umkname), myzip, dir_path)
 
         #Создание КОС
-        kos_doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_kos.docx'))
-        render_in_docx(kos_doc, context_KOS(umk, umkdata, plans, kos_doc), "{0}-КОС".format(umkname), myzip)
+        if plans[0].year>=2016:
+            kos_doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_kos.docx'))
+            render_in_docx(kos_doc, context_KOS(umk, umkdata, plans, kos_doc), "{0}-КОС".format(umkname), myzip, dir_path)
+            if plans[0].exam_semestr:
+                generation_exam_bilets(umk, umkdata, plans, myzip, dir_path)
 
-
+    shutil.rmtree(dir_path,ignore_errors=True)
     res = HttpResponse(tmpfile.getvalue(), content_type='application/zip')
     res['Content-Disposition'] = 'attachment; filename=result-{0}.zip'.format(datetime.today().strftime("%Y-%m-%d"))
     res['Content-Length'] = tmpfile.tell()
@@ -206,13 +218,29 @@ def generation_docx_achive(id_list):
             ]
             umkname = umk.get_short_name()  # имя дисциплины и профиль
 
+            #создание временной дирректории
+            tmpdir = gettempdir()
+            dir_path = "{0}/{1}/{2}/{3}".format(tmpdir, plans[0].year,"{0} {1}".format(plans[0].get_training_program_display(),plans[0].get_qualif_display()),plans[0].discipline)
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+
             ####создание рабочей программы
             doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_work_program.docx'))
-            render_in_docx(doc, context_workprogram(umk, umkdata, plans, doc), umkname, myzip)
+            render_in_docx(doc, context_workprogram(umk, umkdata, plans, doc), umkname, myzip, dir_path)
 
             #создание аннотации
             ann_doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_annotation.docx'))
-            render_in_docx(ann_doc, context_annotation(umk, umkdata, plans, ann_doc), umkname.join("-аннотация-"), myzip)
+            render_in_docx(ann_doc, context_annotation(umk, umkdata, plans, ann_doc), "{0}-аннотация".format(umkname), myzip, dir_path)
+
+            # Создание КОС
+            if plans[0].year >= 2016:
+                kos_doc = DocxTemplate(os.path.join(os.path.join(settings.BASE_DIR, "static/doc_templ"), 'template_kos.docx'))
+                render_in_docx(kos_doc, context_KOS(umk, umkdata, plans, kos_doc), "{0}-КОС".format(umkname), myzip, dir_path)
+                if plans[0].exam_semestr:
+                    generation_exam_bilets(umk, umkdata, plans, myzip, dir_path)
+
+            #удаление временной дирректории
+            shutil.rmtree(dir_path, ignore_errors=True)
 
     res = HttpResponse(tmpfile.getvalue(), content_type='application/zip')
     res['Content-Disposition'] = 'attachment; filename=result-{0}.zip'.format(datetime.today().strftime("%Y-%m-%d"))
