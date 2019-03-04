@@ -6,7 +6,7 @@ def umk_copy(src_umk, dst_umk):
     src_data = UmkData.objects.get(umk_id=src_umk)
     dst_data = UmkData.objects.get(umk_id=dst_umk)
 
-    if Plans.objects.get(id=src_data.umk_id.plan_ochka).discipline.name == Plans.objects.get(id=dst_data.umk_id.plan_ochka).discipline.name:
+    if src_data.umk_id.get_plan_ochka().discipline.name == dst_data.umk_id.get_plan_ochka().discipline.name:
         dst_data.aim = src_data.aim
         dst_data.tasks = src_data.tasks
         dst_data.contentOfSections = src_data.contentOfSections
@@ -25,7 +25,7 @@ def umk_copy(src_umk, dst_umk):
         dst_data.software_lic = src_data.software_lic
         dst_data.kos = src_data.kos
         dst_data.umk_id.status = 'edit'
-        dst_data.umk_id.datetime_changed = str(datetime.now())
+        #dst_data.umk_id.datetime_changed = str(datetime.now())
         dst_data.umk_id.save()
         dst_data.save()
     else:

@@ -103,6 +103,7 @@ TYPE_CONTROL_RATING = [ #виды контрольных мероприятий 
      'Итого за 3-ую аттестацию'
 ]
 
+
 def isNone(val):
     if not val:
         res = ''

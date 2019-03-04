@@ -279,17 +279,32 @@ def get_table_literature(umkdata):
     return res
 
 def get_kontrolnya(plans): #только для заочной формы обучения
-    res = ''
-    if plans[1].kontrolnaya_work == plans[2].kontrolnaya_work and  ( (plans[1].trudoemkost_all - plans[1].hours_samost_work_sum) == (plans[2].trudoemkost_all - plans[2].hours_samost_work_sum)):
-        res = 'Для заочной формы обучения предусмотрена контрольная работа объемом {0} часов в {1} семестре. '.format(plans[1].trudoemkost_all - plans[1].hours_samost_work_sum, plans[1].kontrolnaya_work)
-    else:
-        for i in range(1,3):
-            srok = re.findall(r"\d\.\d|\d+", plans[i].get_training_form_display())[0]
-            if plans[i].kontrolnaya_work:
-                res += 'Для заочной ({0} {1}) формы обучения предусмотрена контрольная работа объемом {2} часов в {3} семестре. '.format(srok, "лет" if float(srok)>=5 else "года",
-                                                                                                                                         plans[i].trudoemkost_all - plans[i].hours_samost_work_sum,
-                                                                                                                                         plans[i].kontrolnaya_work)
 
+    def kontr_gen(plans):
+        res = ''
+        for i in range(1, 3):
+            if plans[i] is not None:
+                srok = re.findall(r"\d\.\d|\d+", plans[i].get_training_form_display())[0]
+                if plans[i].kontrolnaya_work:
+                    res += 'Для заочной ({0} {1}) формы обучения предусмотрена контрольная работа объемом {2} часов в {3} семестре. '.format(
+                                        srok, "лет" if float(srok) >= 5 else "года",
+                                        plans[i].trudoemkost_all - plans[i].hours_samost_work_sum,
+                                        plans[i].kontrolnaya_work)
+        return res
+
+    res = ''
+    if plans[1] is not None and plans[2] is not None:
+        kr_1 = plans[1].kontrolnaya_work
+        kr_2 = plans[2].kontrolnaya_work
+        kr_1_hour = (plans[1].trudoemkost_all - plans[1].hours_samost_work_sum)
+        kr_2_hour = (plans[2].trudoemkost_all - plans[2].hours_samost_work_sum)
+        if kr_1 == kr_2 and  (kr_1_hour == kr_2_hour):
+            res = 'Для заочной формы обучения предусмотрена контрольная работа объемом {0} часов в {1} семестре. '.format(plans[1].trudoemkost_all - plans[1].hours_samost_work_sum, plans[1].kontrolnaya_work)
+        else:
+            res = kontr_gen(plans)
+
+    else:
+        res = kontr_gen(plans)
     return res
 
 def get_table_rating_day(doc_tpl, plan, umkdata):#Оценка результатов освоения учебной дисциплины для очной формы

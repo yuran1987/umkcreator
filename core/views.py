@@ -82,7 +82,7 @@ def showUmkList(request):
     table = []
     obj = UmkArticles.objects.filter(creator=request.user)
     for a in obj:
-        tmp = {'name': Plans.objects.get(id = a.plan_ochka).discipline.name}
+        tmp = {'name': a.get_plan_ochka().discipline.name}
         if tmp not in table:
             table.append(tmp)
 
@@ -94,7 +94,7 @@ def showUmkList_filters(request, training_program="", discipl=""):
     table = []
     obj = UmkArticles.objects.filter(creator=request.user)
     for a in obj:
-        plan = Plans.objects.get(id=a.plan_ochka)
+        plan = a.get_plan_ochka()
         isAdd = False
         if len(training_program)>0 and len(discipl)>0:
             discipl = discipl.replace("+", " ")
@@ -224,11 +224,7 @@ def remove_umk(request,id):
 
 def DataForUmk_core(request, id):
     umkdata = UmkData.objects.get(umk_id_id=id)
-    plan = [
-                Plans.objects.get(id=umkdata.umk_id.plan_ochka),
-                Plans.objects.get(id=umkdata.umk_id.plan_z),
-                Plans.objects.get(id=umkdata.umk_id.plan_zu)
-    ]
+    plan = umkdata.umk_id.get_plan_list()
 
     if request.method == 'POST':
         form = addDatafor_core(request.POST)
@@ -244,18 +240,18 @@ def DataForUmk_core(request, id):
     else:
         form = addDatafor_core(instance=umkdata)
 
-    hours_for_calc  = ['{0}/{1}/{2}'.format(str(plan[0].hours_lectures),str(plan[1].hours_lectures),str(plan[2].hours_lectures)), #лекции
-                       '{0}/{1}/{2}'.format(str(plan[0].hours_pract),str(plan[1].hours_pract),str(plan[2].hours_pract)),          #практики
-                       '{0}/{1}/{2}'.format(str(plan[0].hours_labs),str(plan[1].hours_labs),str(plan[2].hours_labs)),             #лаб
+    hours_for_calc  = ['{0}/{1}/{2}'.format(str(plan[0].hours_lectures), plan[1].hours_lectures if plan[1] is not None else '0',   plan[2].hours_lectures if plan[2] is not None else '0' ), #лекции
+                       '{0}/{1}/{2}'.format(str(plan[0].hours_pract),    plan[1].hours_pract if plan[1] is not None else '0',      plan[2].hours_pract if plan[2] is not None else '0'),    #практики
+                       '{0}/{1}/{2}'.format(str(plan[0].hours_labs),     plan[1].hours_labs if plan[1] is not None else '0',       plan[2].hours_labs if plan[2] is not None else '0'),     #лаб
                        '',
-                       '{0}/{1}/{2}'.format(str(plan[0].hours_samost_work_sum),str(plan[1].hours_samost_work_sum),str(plan[2].hours_samost_work_sum)),#самост работа
-                       '{0}/{1}/{2}'.format(str(plan[0].trudoemkost_all),str(plan[1].trudoemkost_all),str(plan[2].trudoemkost_all)), #всего
+                       '{0}/{1}/{2}'.format(str(plan[0].hours_samost_work_sum), plan[1].hours_samost_work_sum if plan[1] is not None else '0',    plan[2].hours_samost_work_sum if plan[2] is not None else "0"),#самост работа
+                       '{0}/{1}/{2}'.format(str(plan[0].trudoemkost_all),       plan[1].trudoemkost_all if plan[1] is not None else '0',          plan[2].trudoemkost_all if plan[2] is not None else "0"), #всего
                        '{0}'.format(str(plan[0].zanatiya_in_interak_forms_hours))]  #интерактив
 
     kpkr = "<p>Курсовая работа/проект в семестре: "
     for i in range(0,3):
-        if plan[i].kursovya_work_project:
-            kpkr += plan[i].kursovya_work_project + "/"
+        if plan[i] is not None:
+            kpkr += plan[i].kursovya_work_project + "/" if plan[i].kursovya_work_project else "-/"
         else:
             kpkr += "-/"
 
@@ -263,22 +259,27 @@ def DataForUmk_core(request, id):
     if re.search("-/-/-",kpkr):
         kpkr = "<p>Учебным планом курсовых работ/проектов не предусмотрено.</p>"
 
-    if not plan[1].kontrolnaya_work and not plan[2].kontrolnaya_work:
-        kontrol_tooltip = ""
-    else:
-        kontrol_tooltip = "Контр.работа для "
+    kontrol_tooltip = "Контр.работа для "
+    flag = False
+    if plan[1] is not None:
         if plan[1].kontrolnaya_work:
             kontrol_tooltip += "заоч.ф.обуч. в {0} семестре;".format(plan[1].kontrolnaya_work)
+            flag = True
+    if plan[2] is not None:
         if plan[2].kontrolnaya_work:
             kontrol_tooltip += "заоч.уск.ф.обуч. {0} семестре".format(plan[2].kontrolnaya_work)
-
+            flag = True
 
     return render(request, 'edit_umk.html', {'title': settings.SITE_NAME, 'form': form,
                                              'title_form': "Наполнение рабочей программы дисциплины",
                                              'KPKR_tooltip': kpkr,
-                                             'kontrol_work_tooltip': kontrol_tooltip,
+                                             'kontrol_work_tooltip': kontrol_tooltip if flag else "",
                                              'hours_for_calc': hours_for_calc,
-                                             'exam_zachot': '{0},{1}/{2},{3}/{4},{5}'.format(plan[0].zachot_semestr,plan[0].exam_semestr, plan[1].zachot_semestr,plan[1].exam_semestr, plan[2].zachot_semestr,plan[2].exam_semestr),
+                                             'exam_zachot': '{0},{1}/{2},{3}/{4},{5}'.format(plan[0].zachot_semestr,plan[0].exam_semestr,
+                                                                                             plan[1].zachot_semestr if plan[1] is not None else "-",
+                                                                                             plan[1].exam_semestr if plan[1] is not None else "-",
+                                                                                             plan[2].zachot_semestr if plan[2] is not None else "-",
+                                                                                             plan[2].exam_semestr if plan[2] is not None else "-"),
                                              'competences': plan[0].comps.lstrip(),
                                              'forms_control': FORMS_CONTROL,
                                              'type_samost_work': TYPE_SAMOSTOYATELNOY_RABORY,
@@ -287,23 +288,20 @@ def DataForUmk_core(request, id):
 
 def DataForUmk_addons(request, id, type):
     umkdata = UmkData.objects.get(umk_id=id)
-    tmp_plan = [ Plans.objects.get(id=umkdata.umk_id.plan_ochka),
-                 Plans.objects.get(id=umkdata.umk_id.plan_z),
-                 Plans.objects.get(id=umkdata.umk_id.plan_zu)
-               ]
+    plan = umkdata.umk_id.get_plan_list()
 
     hours = "0/0/0"
     if type == 'laborat':
         initl = {'data_field': umkdata.table_laborat_hour}
         title = "4.7 Перечень лабораторных работ"
         header = 'лабораторных'
-        hours = "{0}/{1}/{2}".format(str(tmp_plan[0].hours_labs), str(tmp_plan[1].hours_labs), str(tmp_plan[2].hours_labs))
+        hours = "{0}/{1}/{2}".format(str(plan[0].hours_labs), plan[1].hours_labs if plan[1] is not None else "0", plan[2].hours_labs if plan[2] is not None else "0")
         tooltip = 'Лаб.работы, час. {0}'.format(hours)
     elif type == 'prakt':
         initl = {'data_field': umkdata.table_prakt_hour}
         title = "4.6 Перечень тем практических занятий"
         header = 'практических'
-        hours = "{0}/{1}/{2}".format(str(tmp_plan[0].hours_pract), str(tmp_plan[1].hours_pract), str(tmp_plan[2].hours_pract))
+        hours = "{0}/{1}/{2}".format(str(plan[0].hours_pract), plan[1].hours_pract if plan[1] is not None else "0", plan[2].hours_pract if plan[2] is not None else "0")
         tooltip = 'Практ.работы, час. {0}'.format(hours)
 
     if request.method == 'POST':
@@ -315,7 +313,7 @@ def DataForUmk_addons(request, id, type):
             elif type == 'prakt':
                 umkdata.table_prakt_hour = form.cleaned_data['data_field']
 
-            umkdata.umk_id.datetime_changed = str(timezone.datetime.now(tz=timezone.get_current_timezone()))
+            #umkdata.umk_id.datetime_changed = str(timezone.datetime.now(tz=timezone.get_current_timezone()))
             umkdata.umk_id.save()
             umkdata.save()
             return HttpResponseRedirect(reverse('umk_edit_menu', kwargs={'id': id}))
@@ -326,7 +324,7 @@ def DataForUmk_addons(request, id, type):
                                              'title_form': title, 'table_header': header,
                                              'table_hour_tooltip': tooltip,
                                              'hours_for_calc': hours,
-                                             'competences': tmp_plan[0].comps,
+                                             'competences': plan[0].comps,
                                              'meth_tech': METHODS_TEACHER})
 
 
@@ -339,22 +337,22 @@ def show_rating(request, id):
         if form.is_valid():
             umkdata.table_rating_ochka = form.cleaned_data['rating_ochka']
             umkdata.table_rating_zaochka = form.cleaned_data['rating_zaochka']
-            umkdata.umk_id.datetime_changed = str(timezone.datetime.now(tz=timezone.get_current_timezone()))
+#            umkdata.umk_id.datetime_changed = str(timezone.datetime.now(tz=timezone.get_current_timezone()))
             umkdata.umk_id.save()
             umkdata.save()
             return HttpResponseRedirect(reverse('umk_edit_menu', kwargs={'id': id}))
     else:
         form = rating_form(initial={'rating_ochka': umkdata.table_rating_ochka, 'rating_zaochka': umkdata.table_rating_zaochka})
 
-    totalstr = getTotalstr([ Plans.objects.get(id=umkdata.umk_id.plan_ochka).semestr, Plans.objects.get(id=umkdata.umk_id.plan_z).semestr,
-                             Plans.objects.get(id=umkdata.umk_id.plan_zu).semestr
-                          ], TYPE_CONTROL_RATING)
+    plan = umkdata.umk_id.get_plan_list()
+
+    totalstr = getTotalstr([ plan[0].semestr, plan[1].semestr if plan[1] is not None else "0" , plan[2].semestr if plan[2] is not None else "0"], TYPE_CONTROL_RATING)
 
     return render(request, 'edit_umk_rating.html', {'title': settings.SITE_NAME, 'form': form,
                                                  'title_form': "Рейтинговая система оценки",
                                                  'type_control_rating_ochka': totalstr['ochka'],
                                                  'type_control_rating_zaochka': totalstr['zaochka'],
-                                                 'weeks_count': Plans.objects.get(id=umkdata.umk_id.plan_ochka).weeks_count_in_semestr})
+                                                 'weeks_count': umkdata.umk_id.get_plan_ochka().weeks_count_in_semestr})
 
 def show_liter(request, id):
     umkdata = UmkData.objects.get(umk_id=id)
@@ -364,7 +362,7 @@ def show_liter(request, id):
         # check whether it's valid:
         if form.is_valid():
             umkdata.table_literature = form.cleaned_data['data_field']
-            umkdata.umk_id.datetime_changed = str(timezone.datetime.now(tz=timezone.get_current_timezone()))
+            #umkdata.umk_id.datetime_changed = str(timezone.datetime.now(tz=timezone.get_current_timezone()))
             umkdata.umk_id.save()
             umkdata.save()
             return HttpResponseRedirect(reverse('umk_edit_menu', kwargs={'id': id}))
@@ -393,18 +391,15 @@ def actions(request, type, id=0):
         return DataForUmk_core(request, id)
     elif type == 'actlist':
         umk = UmkArticles.objects.get(id=id)
-        plans = [
-            Plans.objects.get(id=umk.plan_ochka),
-            Plans.objects.get(id=umk.plan_z),
-            Plans.objects.get(id=umk.plan_zu)
-        ]
+        plans = umk.get_plan_list()
         act = []
 
-        if plans[0].hours_labs > 0 or plans[1].hours_labs > 0 or plans[2].hours_labs > 0:
-            act.append({'url': "/umk/edit/{0}/laborat/".format(id), 'name': "Перечень лабораторных работ"})
+        if umk.checkHourLabs(plans[0]) or umk.checkHourLabs(plans[1]) or umk.checkHourLabs(plans[2]):
+            act.append({'url': reverse('edit_lab', kwargs={'id': id}), 'name': "Перечень лабораторных работ"})
 
-        if plans[0].hours_pract > 0 or plans[1].hours_pract > 0 or plans[2].hours_pract > 0:
-            act.append({'url': "/umk/edit/{0}/prakt/".format(id), 'name': "Перечень практических работ"})
+
+        if umk.checkHourPrakt(plans[0]) or umk.checkHourPrakt(plans[1]) or umk.checkHourPrakt(plans[2]):
+            act.append({'url': reverse('edit_prakt', kwargs={'id': id}), 'name': "Перечень практических работ"})
 
         return render(request, 'edit_umk_actions.html', {'title': settings.SITE_NAME,
                                                          'discipline': plans[0].discipline.name,
@@ -468,23 +463,23 @@ def kos_menu(request, id):
             return {'url': "kos_zadachi", 'name': 'Комплект разноуровневых заданий (задач)'}
 
 
-    for item in js.decode(umkdata.table_rating_ochka):
-        res = search_rating(item[1].lower())
-        if (res not in lmenu) and res:
-            lmenu.append(res)
+    if umkdata.table_rating_ochka:
+        for item in js.decode(umkdata.table_rating_ochka):
+            res = search_rating(item[1].lower())
+            if (res not in lmenu) and res:
+                lmenu.append(res)
 
-    for item in js.decode(umkdata.table_rating_zaochka):
-        res = search_rating(item[1].lower())
-        if (res not in lmenu) and res:
-            lmenu.append(res)
+    if umkdata.table_rating_zaochka:
+        for item in js.decode(umkdata.table_rating_zaochka):
+            res = search_rating(item[1].lower())
+            if (res not in lmenu) and res:
+                lmenu.append(res)
 
-    plans = [ Plans.objects.get(id = umkdata.umk_id.plan_ochka),
-              Plans.objects.get(id=umkdata.umk_id.plan_z),
-              Plans.objects.get(id=umkdata.umk_id.plan_zu)
-              ]
-    if plans[0].exam_semestr or plans[1].exam_semestr or plans[2].exam_semestr:
+    plans = umkdata.umk_id.get_plan_list()
+
+    if umkdata.umk_id.isExamInPlan(plans):
         lmenu.append({'url': "kos_vorosy_exam", 'name': 'Вопросы к экзамену'})
-    if plans[0].zachot_semestr or plans[1].zachot_semestr or plans[2].zachot_semestr:
+    if umkdata.umk_id.isZachotInPlan(plans):
         lmenu.append({'url': "kos_vorosy_zachot", 'name': 'Вопросы к зачету'})
 
     return render(request, 'kos_menu.html', {'title': settings.SITE_NAME,
@@ -553,7 +548,7 @@ def showUmkForSignature(request):
         user_depart = User.objects.get(username=request.user).deparmt
         for a in obj:
             if user_depart == User.objects.get(username=a.creator).deparmt:
-                plan = Plans.objects.get(id=a.plan_ochka)
+                plan = a.get_plan_ochka()
                 table.append({'id': a.id,
                               'type': "{0}, {1} {2}а".format(plan.direction, plan.get_training_program_display(),
                                                              plan.get_qualif_display()),

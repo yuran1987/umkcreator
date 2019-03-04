@@ -23,7 +23,7 @@ from .generator_core import get_predsedatel_spn, get_zaf_kaf, get_course, isEmpt
 ######################################################################################################################
 def context_workprogram(umk, umkdata, plans, doc_tpl):
     dateprikaz = plans[0].get_direction_date_prikaz()
-    kursovya_work_project_sem = [re.findall("\d+",plan.kursovya_work_project)[0] for plan in plans if re.findall("\d+",plan.kursovya_work_project)] #номер семестра на курсовой проект
+    kursovya_work_project_sem = [re.findall("\d+",plan.kursovya_work_project)[0] for plan in plans if re.findall("\d+",plan.kursovya_work_project if plan is not None else "-")] #номер семестра на курсовой проект
     predsedatel_spn_ksn = get_predsedatel_spn(plans[0].direction.deparmt)
 
     context = {'ministerstvo': plans[0].ministerstvo,#umk.creator.deparmt.units.univer.ministerstvo,
@@ -41,29 +41,38 @@ def context_workprogram(umk, umkdata, plans, doc_tpl):
                'Profiles': plans[0].get_profiles(),
                'qualification': plans[0].get_qualif_display(),
                'program_traning': "{0} {1}а".format(plans[0].get_training_program_display(),plans[0].get_qualif_display()),
-               'cources': "{0}/{1}/{2}".format(get_course(plans[0].get_semestrs()),get_course(plans[1].get_semestrs()),get_course(plans[2].get_semestrs())),                                                   #нужно рассчитать изходя из семестров
-               'semestrs': "{0}/{1}/{2}".format(plans[0].get_semestrs(), plans[1].get_semestrs(),
-                                                plans[2].get_semestrs()),
-               'audit_total_hours': "{0}/{1}/{2}".format(plans[0].hours_audit_work_sum, plans[1].hours_audit_work_sum,
-                                                         plans[2].hours_audit_work_sum),
-               'lectures_total_hours': isEmptyValOrStr(plans[0].hours_lectures, plans[1].hours_lectures,
-                                                       plans[2].hours_lectures),
-               'prakt_total_hours': isEmptyValOrStr(plans[0].hours_pract, plans[1].hours_pract, plans[2].hours_pract),
-               'labs_total_hours': isEmptyValOrStr(plans[0].hours_labs, plans[1].hours_labs, plans[2].hours_labs),
+               'cources': "{0}/{1}/{2}".format(get_course(plans[0].get_semestrs()),
+                                               get_course(plans[1].get_semestrs()) if plans[1] else "-",
+                                               get_course(plans[2].get_semestrs()) if plans[2] else "-"),                                                   #нужно рассчитать изходя из семестров
+               'semestrs': "{0}/{1}/{2}".format(plans[0].get_semestrs(),
+                                                plans[1].get_semestrs() if plans[1] else "-",
+                                                plans[2].get_semestrs() if plans[2] else "-" ),
+               'audit_total_hours': "{0}/{1}/{2}".format(plans[0].hours_audit_work_sum,
+                                                         plans[1].hours_audit_work_sum if plans[1] else "-" ,
+                                                         plans[2].hours_audit_work_sum if plans[2] else "-"),
+               'lectures_total_hours': isEmptyValOrStr(plans[0].hours_lectures,
+                                                       plans[1].hours_lectures if plans[1] else 0,
+                                                       plans[2].hours_lectures if plans[2] else 0),
+               'prakt_total_hours': isEmptyValOrStr(plans[0].hours_pract,
+                                                    plans[1].hours_pract if plans[1] else 0,
+                                                    plans[2].hours_pract if plans[2] else 0),
+               'labs_total_hours': isEmptyValOrStr(plans[0].hours_labs,
+                                                   plans[1].hours_labs if plans[1] else 0,
+                                                   plans[2].hours_labs if plans[2] else 0),
                'samost_total_hours': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,
-                                                          plans[1].hours_samost_work_sum,
-                                                          plans[2].hours_samost_work_sum),
+                                                          plans[1].hours_samost_work_sum if plans[1] else 0,
+                                                          plans[2].hours_samost_work_sum if plans[2] else 0),
                'kursovya_num_semestr': isEmptyValOrStr(kursovya_work_project_sem[0],kursovya_work_project_sem[1],kursovya_work_project_sem[2]) if kursovya_work_project_sem else "-",
                'kursovya_hours': get_hour_kursovaya_work_or_project(umkdata),
                'raschotno_graph_work_semests': "-",
                'raschotno_graph_work_hours': "-",
                'zanyatiya_in_interaktiv_hours': "{0}".format(plans[0].zanatiya_in_interak_forms_hours),
                'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if plans[0].zachot_semestr else isEmptyVal(plans[0].zachot_semestr),
-                                                       plans[1].zachot_semestr if plans[1].zachot_semestr else isEmptyVal(plans[1].zachot_semestr),
-                                                       plans[2].zachot_semestr if plans[2].zachot_semestr else isEmptyVal(plans[2].zachot_semestr)),
+                                                       plans[1].zachot_semestr if plans[1].zachot_semestr else "-" if plans[1] is not None else "-",
+                                                       plans[2].zachot_semestr if plans[2].zachot_semestr else "-" if plans[2] is not None else "-"),
                'exam_semestrs': "{0}/{1}/{2}".format(plans[0].exam_semestr if plans[0].exam_semestr else isEmptyVal(plans[0].exam_semestr),
-                                                       plans[1].exam_semestr if plans[1].exam_semestr else isEmptyVal(plans[1].exam_semestr),
-                                                       plans[2].exam_semestr if plans[2].exam_semestr else isEmptyVal(plans[2].exam_semestr)),
+                                                     plans[1].exam_semestr if plans[1].exam_semestr else "-" if plans[1] is not None else "-",
+                                                     plans[2].exam_semestr if plans[2].exam_semestr else "-" if plans[2] is not None else "-"),
                'trudoemkost_all': "{0}".format(plans[0].trudoemkost_all),
                'zachot_edinic': "{0}".format(plans[0].trudoemkost_zachot_edinic),
                'prikaz_number': dateprikaz[0],
@@ -84,8 +93,12 @@ def context_workprogram(umk, umkdata, plans, doc_tpl):
                'tbl_labs_hours': get_table_labs_prakt(umkdata.table_laborat_hour, doc_tpl, 'лабораторных'),
                'tbl_samost_hours': get_table_samost_hours(umkdata),
                'tbl_liter': get_table_literature(umkdata),
-               'samost_total': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,plans[1].hours_samost_work_sum,plans[2].hours_samost_work_sum),
-               'samost_total_without_prepod': "{0}/{1}/{2}".format(plans[0].hours_samost_wo_lec,plans[1].hours_samost_work_sum,plans[2].hours_samost_work_sum),
+               'samost_total': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,
+                                                    plans[1].hours_samost_work_sum if plans[1] is not None else "-",
+                                                    plans[2].hours_samost_work_sum if plans[2] is not None else "-"),
+               'samost_total_without_prepod': "{0}/{1}/{2}".format(plans[0].hours_samost_wo_lec,
+                                                                   plans[1].hours_samost_work_sum if plans[1] is not None else "-",
+                                                                   plans[2].hours_samost_work_sum if plans[2] is not None else "-"),
                'samost_total_with_student': "{0}/-/-".format(plans[0].hours_samost_w_lec_w_stud),
                'samost_total_with_group': "{0}/-/-".format(plans[0].hours_samost_w_lec_w_group),
                'theme_kursovii_work': umkdata.theme_kursovih_rabot if len(umkdata.theme_kursovih_rabot)>1 else 'Учебным планом выполнение курсовых работ не предусмотрено.',
@@ -94,14 +107,14 @@ def context_workprogram(umk, umkdata, plans, doc_tpl):
                'software_obespechenie': html_to_docx(umkdata.software_lic, doc_tpl) if umkdata.software_lic else '',
                #-------------------------------------------Рейтинг------------------------------------------------------
                'rating_day': get_table_rating_day(doc_tpl,plans[0], umkdata),
-               'rating_night':get_table_rating_night(doc_tpl, umkdata),
+               'rating_night':get_table_rating_night(doc_tpl, umkdata) if plans[1] and plans[2] is not None else '',
                #-----------------------------------------ЛИТЕРАТУРА-----------------------------------------------------
                'crs_och': get_course(plans[0].get_semestrs()),
-               'crs_z': get_course(plans[1].get_semestrs()),
-               'crs_zu': get_course(plans[2].get_semestrs()),
+               'crs_z': get_course(plans[1].get_semestrs())  if plans[1] is not None else "-",
+               'crs_zu': get_course(plans[2].get_semestrs()) if plans[2] is not None else "-",
                'smr_och': plans[0].get_semestrs(),
-               'smr_z': plans[1].get_semestrs(),
-               'smr_zu': plans[2].get_semestrs()
+               'smr_z': plans[1].get_semestrs() if plans[1] is not None else "-",
+               'smr_zu': plans[2].get_semestrs() if plans[2] is not None else "-"
                }
     return context
 
@@ -129,17 +142,18 @@ def context_annotation(umk, umkdata, plans, doc_tpl):
                           'rank': ", {0}".format(umk.creator.get_science_zvanie_display()) if umk.creator.science_zvanie!='no' else ""},
                'discipline': plans[0].get_discipline(),
                'direction': plans[0].get_direction(),
-               'audit_total_hours': "{0}/{1}/{2}".format(plans[0].hours_audit_work_sum, plans[1].hours_audit_work_sum,
-                                                         plans[2].hours_audit_work_sum),
+               'audit_total_hours': "{0}/{1}/{2}".format(plans[0].hours_audit_work_sum,
+                                                         plans[1].hours_audit_work_sum if plans[1] is not None else "-",
+                                                         plans[2].hours_audit_work_sum if plans[2] is not None else "-"),
                'samost_total_hours': "{0}/{1}/{2}".format(plans[0].hours_samost_work_sum,
-                                                          plans[1].hours_samost_work_sum,
-                                                          plans[2].hours_samost_work_sum),
+                                                          plans[1].hours_samost_work_sum if plans[1] is not None else "-",
+                                                          plans[2].hours_samost_work_sum if plans[2] is not None else "-"),
                'zachot_semestrs': "{0}/{1}/{2}".format(plans[0].zachot_semestr if plans[0].zachot_semestr else isEmptyVal(plans[0].zachot_semestr),
-                                                       plans[1].zachot_semestr if plans[1].zachot_semestr else isEmptyVal(plans[1].zachot_semestr),
-                                                       plans[2].zachot_semestr if plans[2].zachot_semestr else isEmptyVal(plans[2].zachot_semestr)),
+                                                       plans[1].zachot_semestr if plans[1].zachot_semestr else "-" if plans[1] is not None else "-",
+                                                       plans[2].zachot_semestr if plans[2].zachot_semestr else "-" if plans[2] is not None else "-"),
                'exam_semestrs': "{0}/{1}/{2}".format(plans[0].exam_semestr if plans[0].exam_semestr else isEmptyVal(plans[0].exam_semestr),
-                                                       plans[1].exam_semestr if plans[1].exam_semestr else isEmptyVal(plans[1].exam_semestr),
-                                                       plans[2].exam_semestr if plans[2].exam_semestr else isEmptyVal(plans[2].exam_semestr)),
+                                                     plans[1].exam_semestr if plans[1].exam_semestr else "-" if plans[1] is not None else "-",
+                                                     plans[2].exam_semestr if plans[2].exam_semestr else "-" if plans[2] is not None else "-"),
                'trudoemkost_all': "{0}".format(plans[0].trudoemkost_all),
                'year_nabor': plans[0].year,
                # -------------------------------------------------------------------------------------------------------
@@ -166,11 +180,7 @@ def render_in_docx(document,context, umkname, save_tozip,directory):
 def generation_docx(id):#формирование только одной рабочей программы и аннотации
     umkdata = UmkData.objects.get(umk_id=id)
     umk = umkdata.umk_id
-    plans = [
-        Plans.objects.get(id=umk.plan_ochka),
-        Plans.objects.get(id=umk.plan_z),
-        Plans.objects.get(id=umk.plan_zu),
-    ]
+    plans = umk.get_plan_list()
     umkname = umk.get_short_name()  # имя дисциплины и профиль
 
     tmpdir = gettempdir()
@@ -211,11 +221,7 @@ def generation_docx_achive(id_list):
         for id in id_list:
             umkdata = UmkData.objects.get(umk_id=id)
             umk = umkdata.umk_id
-            plans = [
-                Plans.objects.get(id=umk.plan_ochka),
-                Plans.objects.get(id=umk.plan_z),
-                Plans.objects.get(id=umk.plan_zu),
-            ]
+            plans = umk.get_plan_list()
             umkname = umk.get_short_name()  # имя дисциплины и профиль
 
             #создание временной дирректории

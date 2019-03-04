@@ -238,27 +238,71 @@ class UmkArticles(models.Model):
         ['empty', u'Пустая']
     )
 
-    plan_ochka = models.PositiveIntegerField(null=True,verbose_name=u'Учебный план для очн.ф.обуч.')  # учебный план для очной формы обучения
-    plan_z = models.PositiveIntegerField(null=True, verbose_name=u'Учебный план для заоч.ф.обуч.')  # учебный план для заочной формы обучения
-    plan_zu = models.PositiveIntegerField(null=True,verbose_name=u'Учебный план для заоч.-уск.ф.обуч.')  # учебный план для заочно-ускоренной формы обучения
+    plan = models.CharField(max_length=255,null=True,
+                            verbose_name=u'Учебный план',
+                            help_text=u'Формат: 0/1/2')  # учебный план для очной формы обучения /
+                                                         # учебный план для заочной формы обучения /
+                                                         # учебный план для заочно-ускоренной формы обучения
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=u'Пользователь')
-    datetime_created = models.DateTimeField(verbose_name=u'Дата создания',default=timezone.now)
-    datetime_changed = models.DateTimeField(verbose_name=u'Дата изменения',default=timezone.now)
+    datetime_created = models.DateTimeField(verbose_name=u'Дата создания',auto_created=True, default=timezone.now)
+    datetime_changed = models.DateTimeField(verbose_name=u'Дата изменения',auto_now=True)
     status = models.CharField(max_length=50, choices=statuschoices, default = 'empty', verbose_name=u'Статус')
 
     class Meta:
         verbose_name = u'Рабочая программа'
         verbose_name_plural = u'Рабочие программы'
 
+    def get_plan_ochka(self):
+        return Plans.objects.get(id = int(self.plan.split("/")[0]))
+
+    def get_plan_list(self):
+        res = []
+        for i in self.plan.split("/"):
+            if i.isdigit():
+                res.append(Plans.objects.get(id = int(i)))
+            else:
+                res.append(None)
+                print("Plan ", i, " is empty")
+        return res
+
+    def isExamInPlan(self, plans):
+        res = False
+        for p in plans:
+            if p is not None:
+                if p.exam_semestr:
+                    res = True
+        return res
+
+    def isZachotInPlan(self, plans):
+        res = False
+        for p in plans:
+            if p is not None:
+                if p.zachot_semestr:
+                    res = True
+        return res
+
+    def checkHourPrakt(self,plan):
+        res = False
+        if plan is not None:
+            res = True if plan.hours_pract > 0 else False
+        return res
+
+    def checkHourLabs(self,plan):
+        res = False
+        if plan is not None:
+            res = True if plan.hours_labs > 0 else False
+        return res
+
     def get_short_name(self):
-        name = str(Plans.objects.get(id=self.plan_ochka).discipline.name)
-        prof = str(Plans.objects.get(id=self.plan_ochka).get_profiles())
+        plan_ochka = self.get_plan_ochka()
+        name = str(plan_ochka.discipline.name)
+        prof = str(plan_ochka.get_profiles())
         res1 = name if len(name) < 15 else name[0:35]
         res2 = prof if len(prof) < 15 else prof[0:35]
         return "{0}-{1}".format(res1,res2)
 
     def __str__(self):
-        plan = Plans.objects.get(id=self.plan_ochka)
+        plan = self.get_plan_ochka()
         return '#' + str(self.id) + ' ' + str(plan.discipline.name if len(plan.discipline.name)<15 else plan.discipline.name[0:35]+"...") + " " + str(plan.get_profiles()) + " {0} {1}а".format(plan.get_training_program_display(),plan.get_qualif_display())
 
 

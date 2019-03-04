@@ -26,8 +26,8 @@ class SelectDisipForm(forms.Form):
 
 class SelectPlanForm(forms.ModelForm):
     f_plan_ochka = forms.ModelChoiceField(queryset=Plans.objects.all(), help_text=u'Выберете учебный план для очной формы обучения', label=u'Учебный план для очн.ф.обуч.')
-    f_plan_z = forms.ModelChoiceField(queryset=Plans.objects.all(), help_text=u'Выберете учебный план для заочной формы обучения', label=u'Учебный план для заоч.ф.обуч.')
-    f_plan_zu = forms.ModelChoiceField(queryset=Plans.objects.all(), help_text=u'Выберете учебный план для заочно-ускоренной формы обучения',  label=u'Учебный план для заоч.-уск.ф.обуч.')
+    f_plan_z = forms.ModelChoiceField(queryset=Plans.objects.all(), help_text=u'Выберете учебный план для заочной формы обучения', label=u'Учебный план для заоч.ф.обуч.',required=False)
+    f_plan_zu = forms.ModelChoiceField(queryset=Plans.objects.all(), help_text=u'Выберете учебный план для заочно-ускоренной формы обучения',  label=u'Учебный план для заоч.-уск.ф.обуч.',required=False)
 
     def __init__(self, *args, **kwargs):
         super(SelectPlanForm, self).__init__(*args, **kwargs)
@@ -41,11 +41,10 @@ class SelectPlanForm(forms.ModelForm):
     def save(self, user, commit=True):
         instance = super(SelectPlanForm, self).save(commit=False)
         instance.creator = user
-        instance.datetime_created = str(datetime.now())
-        instance.datetime_changed = str(datetime.now())
-        instance.plan_ochka = self.cleaned_data['f_plan_ochka'].id
-        instance.plan_z = self.cleaned_data['f_plan_z'].id
-        instance.plan_zu = self.cleaned_data['f_plan_zu'].id
+        instance.plan = "{0}/{1}/{2}".format(self.cleaned_data['f_plan_ochka'].id,
+                                             self.cleaned_data['f_plan_z'].id if self.cleaned_data['f_plan_z'] is not None else "-",
+                                             self.cleaned_data['f_plan_zu'].id if self.cleaned_data['f_plan_zu'] is not None else "-")
+        #print("plan: ",instance.plan)
         if commit:
             instance.save()
         return instance
@@ -100,7 +99,6 @@ class addDatafor_core(forms.ModelForm):
         instance.id = id
         instance.umk_id = umk_id
         instance.umk_id.status = 'edit'
-        instance.umk_id.datetime_changed = str(datetime.now())
         instance.umk_id.save()
         instance.table_prakt_hour = table_prakt_hour
         instance.table_laborat_hour = table_laborat_hour
