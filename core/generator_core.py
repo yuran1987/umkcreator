@@ -71,9 +71,12 @@ def get_course(s):
 
     return ",".join(res)
 
+def get_competens_list(plan):
+    return re.split(r"[, ]+",plan.comps)
+
 def get_competens(plan):
     res = []
-    list = plan.comps.split(" ")
+    list = get_competens_list(plan)
 
     for v in list:
         if v:
@@ -81,22 +84,40 @@ def get_competens(plan):
             for c in cmps:
                 print("comp: " + v + " " + c.training_program + " search: " + plan.training_program)
                 if c.training_program == plan.training_program:
-                    res.append({'name': c.name, 'full_content': c.full_content, 'student_known': c.should_know, 'student_can': c.should_able, 'student_own': c.should_master,
-                                'indicators_know': c.indicators_know, 'indicators_can': c.indicators_can, 'indicators_own': c.indicators_own})
+                    res.append({'name': c.name, 'full_content': c.full_content, 'student_known': c.should_know+";", 'student_can': c.should_able+";", 'student_own': c.should_master+";",
+                                'indicators_know': c.indicators_know+";", 'indicators_can': c.indicators_can+";", 'indicators_own': c.indicators_own+";"})
 
 
     return res
 
+def add_signature(pic,doc_tpl):
+    sd = doc_tpl.new_subdoc()
+    if pic:
+        p = sd.add_paragraph()
+        p.clear()
+        sd.add_picture(pic)
+    return sd
+
+def get_zaf_kaf_w_signature_pic(zaf_kav, doc_tpl):
+    return {'name': zaf_kav['name'],
+             'position': zaf_kav['position'],
+             'science_stepen': zaf_kav['science_stepen'],
+             'science_zvanie': zaf_kav['science_zvanie'],
+             'signature': add_signature(zaf_kav['signature'], doc_tpl)
+             }
+
 def get_zaf_kaf(deparmt):#получаем ФИО зав кафедрой
     user = User.objects.filter(deparmt=deparmt)
-    res = {"name": '', "position": '', 'science_stepen':'', 'science_zvanie':''}
+    res = {"name": '', "position": '', 'science_stepen':'', 'science_zvanie':'', 'signature':''}
 
     for u in user:
         if u.position == "io_zaf_kaf" or u.position == "zaf_kaf":
             res = {'name': "{0} {1}. {2}.".format(u.last_name, u.first_name[0], u.patronymic[0]),
                    'position': u.get_position_display().capitalize(),
                    'science_stepen':u.get_science_stepen_display(),
-                   'science_zvanie':u.get_science_zvanie_display()}
+                   'science_zvanie':u.get_science_zvanie_display(),
+                   'signature': u.electronic_signature #цифровая подпись
+                   }
 
     return res
 
@@ -112,7 +133,7 @@ def get_predsedatel_spn(deparmt):#председатель СПН
 
     return res
 
-def required_reconcil(umkcreator, plans):#формирование надписи согласовано
+def required_reconcil(plans):#формирование надписи согласовано
     zaf_kaf = get_zaf_kaf(plans[0].direction.deparmt)
     return {'position': "{0} выпускающей кафедрой".format(zaf_kaf['position'].replace("каф.","")), 'name': zaf_kaf['name']}
 
@@ -130,11 +151,11 @@ def get_OPOP_of_discipline(plans):
 
     return res
 
-def get_placeInStructOPOP(plans, discipline, doc_tpl):
+def get_placeInStructOPOP(plans, doc_tpl):
     prev_next_discip = previous_and_next_disciplines_from_umk(plans[0],Plans)
     res = ["",""]
     if prev_next_discip['previous_disciplines']:
-        res[0] = "Для полного усвоения данной дисциплины обучающиеся должны знать следующие дисциплины: "
+        res[0] = "Предшедствующие дисциплины: "
         for d in prev_next_discip['previous_disciplines']:
             res[0] += " {0} - {1};".format(d.code_OPOP, d.discipline.name)
 
@@ -143,7 +164,7 @@ def get_placeInStructOPOP(plans, discipline, doc_tpl):
             res[0] +="."
 
     if prev_next_discip['next_disciplines']:
-        res[1] += "Знания по дисциплине \"{0}\" необходимы обучающимся данного направления для усвоения знаний по следующим дисциплинам: ".format(discipline)
+        res[1] += "Последующие дисциплины: "
         for d in prev_next_discip['next_disciplines']:
             res[1] += " {0} - {1};".format(d.code_OPOP, d.discipline.name)
 
@@ -267,16 +288,20 @@ def get_hour_raschetno_graph_work(umk_data):#возвращает количес
     return res
 
 
-def get_table_literature(umkdata):
+def get_table_literature_from_json(table_lit):
     res = []
     js = json.JSONDecoder()
-    if umkdata.table_literature:
-        list = js.decode(umkdata.table_literature)
+    if table_lit:
+        list = js.decode(table_lit)
 
         for item in list:
             res.append({'main_add': item[0], 'name': item[1], 'year': item[2], 'type': item[3], 'vid': item[4],
-                        'count': item[5], 'kontingent': item[6], 'obespechennost': item[7], 'place': item[8], 'electr_variant': item[9]})
+                        'count': item[5], 'kontingent': item[6], 'obespechennost': item[7], 'place': item[8],
+                        'electr_variant': item[9]})
     return res
+
+def get_table_literature(umkdata):
+    return get_table_literature_from_json(umkdata.table_literature)
 
 def get_kontrolnya(plans): #только для заочной формы обучения
 

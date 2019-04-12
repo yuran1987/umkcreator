@@ -7,10 +7,10 @@ from django.views.generic import DetailView, UpdateView, FormView
 from django.contrib.auth import get_user_model
 from tempfile import NamedTemporaryFile
 import re, json
-from .forms import SelectDisipForm,SelectPlanForm,addDatafor_core, addDatafor_addons_form, rating_form, UploadFilePlanForm, literature_form, UploadFileCompetenceForm, UserFormEdit,Umkcopy_form, form_kos
+from .forms import SelectDisipForm,SelectPlanForm,addDatafor_core, addDatafor_addons_form, rating_form, UploadFilePlanForm, literature_form, card_method_obespech, UploadFileCompetenceForm, UserFormEdit,Umkcopy_form, form_kos
 from .import_plans import PlanImport, TypeEduPlan
 from .models import UmkArticles,Plans, UmkData, User, Ministerstvo, Univercity
-from .docxpdf_generator import generation_docx, generation_docx_achive
+from .docxpdf_generator import generation_docx, generation_docx_achive, generation_meth_obespech
 from .getsysinfo import get_os_info, get_cpu_info,get_meminfo,get_django_version,get_ip_address_server,get_ip_client, get_cpu_cores
 from .search_lit import get_lit_urait_json, get_lit_lanbook_json
 from .import_competence import CompetenceImport
@@ -227,15 +227,10 @@ def DataForUmk_core(request, id):
     plan = umkdata.umk_id.get_plan_list()
 
     if request.method == 'POST':
-        form = addDatafor_core(request.POST)
+        form = addDatafor_core(request.POST, instance=umkdata)
         # check whether it's valid:
         if form.is_valid():
-            form.save(id=umkdata.id, umk_id = umkdata.umk_id,
-                      table_prakt_hour=umkdata.table_prakt_hour,
-                      table_laborat_hour=umkdata.table_laborat_hour,
-                      table_rating_ochka=umkdata.table_rating_ochka,
-                      table_rating_zaochka=umkdata.table_rating_zaochka,
-                      table_literature=umkdata.table_literature)
+            form.save()
             return HttpResponseRedirect(reverse('umk_edit_menu', kwargs={'id': id}))
     else:
         form = addDatafor_core(instance=umkdata)
@@ -275,7 +270,8 @@ def DataForUmk_core(request, id):
                                              'KPKR_tooltip': kpkr,
                                              'kontrol_work_tooltip': kontrol_tooltip if flag else "",
                                              'hours_for_calc': hours_for_calc,
-                                             'exam_zachot': '{0},{1}/{2},{3}/{4},{5}'.format(plan[0].zachot_semestr,plan[0].exam_semestr,
+                                             'exam_zachot': '{0};{1}/{2};{3}/{4};{5}'.format(plan[0].zachot_semestr,
+                                                                                             plan[0].exam_semestr,
                                                                                              plan[1].zachot_semestr if plan[1] is not None else "-",
                                                                                              plan[1].exam_semestr if plan[1] is not None else "-",
                                                                                              plan[2].zachot_semestr if plan[2] is not None else "-",
@@ -384,6 +380,39 @@ def get_literature_from_url(request, type, search, id=0):
     response = JsonResponse(data,safe=False,charset='utf-8')
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+def get_literature_json(request, umk_id): #получение списка литературы для заданной рабочей программы в id
+    umk = UmkData.objects.get(umk_id = umk_id)
+    if umk:
+        data = umk.table_literature
+    else:
+        data = "empty"
+    response = JsonResponse({"table_literature": data},safe=True,charset='utf-8')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+def generation_card_method_obespech(request):
+    if request.method == 'POST':
+        form = card_method_obespech(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            if 'save' in request.POST.keys():
+                umkdata = UmkData.objects.get(umk_id_id=form.cleaned_data['umk_src'].id)
+                umkdata.table_literature = form.cleaned_data['data_field']
+                umkdata.umk_id.save()
+                umkdata.save()
+            elif 'export' in request.POST.keys():
+                return generation_meth_obespech(form.cleaned_data['umk_src'].id, form.cleaned_data['data_field'])
+
+            return HttpResponseRedirect(reverse('KMO_work'))
+    else:
+        form = card_method_obespech()
+        form.fields['umk_src'].queryset = UmkArticles.objects.filter(creator=request.user)
+
+    return render(request, 'card_method_obespech.html', {'title': settings.SITE_NAME, 'form': form,
+                                               'title_form': "Карта обеспеченности дисциплины учебной и учебно-методической литературой"})
+
 
 
 def actions(request, type, id=0):

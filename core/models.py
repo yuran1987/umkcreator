@@ -143,8 +143,8 @@ class Plans(models.Model):  # Учебный план
 # Другие
     exam_semestr = models.CharField(max_length=10,verbose_name=u'Экзамен в семестре', help_text=u'Формат: 1,2', null=True,blank=True)  # экзамен в семестре
     zachot_semestr = models.CharField(max_length=10,verbose_name=u'Зачет в семестре', help_text=u'Формат: 1,2', null=True,blank=True)  # зачет в семестре
-    kursovya_work_project = models.CharField(null=True,max_length=15, verbose_name=u'КП/КР') #Курсовой проект/курсовая работа
-    kontrolnaya_work = models.CharField(null=True,max_length=15, verbose_name=u'Контрольная работа', help_text=u'заполняется только для заочников') #Контрольная работа заполняется только для заочников
+    kursovya_work_project = models.CharField(max_length=15, verbose_name=u'КП/КР',null=True, blank=True) #Курсовой проект/курсовая работа
+    kontrolnaya_work = models.CharField(max_length=15, verbose_name=u'Контрольная работа', help_text=u'заполняется только для заочников',null=True, blank=True) #Контрольная работа заполняется только для заочников
     zanatiya_in_interak_forms_hours = models.PositiveIntegerField(null=True, default=1, verbose_name=u'Занятия в интерактивной форме, часов')  # занятия в интерактивной форме, часов
     comps = models.TextField(null=True,blank=True, verbose_name=u'Компетенции') #Список компетенций
     weeks_count_in_semestr = models.CharField(max_length=20,verbose_name=u'Количество недель в семестре', help_text=u'Формат: 17,18', null=True,blank=True)  # Количество недель в семестре
@@ -201,15 +201,16 @@ class Plans(models.Model):  # Учебный план
 
     def check_trudoemkost(self):
         v_audit = self.hours_lectures + self.hours_labs + self.hours_pract
-        v_samot = self.hours_samost_wo_lec + self.hours_samost_w_lec_w_stud + self.hours_samost_w_lec_w_group
+        v_samot = round(self.hours_samost_wo_lec + self.hours_samost_w_lec_w_stud + self.hours_samost_w_lec_w_group)
         color_code = '000000'
-        s_msg = ''
+        s_msg = 'Unknown'
+
         if v_audit != self.hours_audit_work_sum:
             color_code = 'FF0000'
             s_msg = u'Ошибка в аудиторных часах'
-        elif round(v_samot) != self.hours_samost_work_sum:
+        elif v_samot != self.hours_samost_work_sum:
             color_code = 'FF0000'
-            s_msg = u'Ошибка в самостоятельных часах {0}!={1}'.format(round(v_samot),self.hours_samost_work_sum)
+            s_msg = u'Ошибка в самостоятельных часах {0}!={1}'.format(v_samot,self.hours_samost_work_sum)
         elif (v_audit + v_samot) == self.trudoemkost_all:
             color_code = '008000'
             s_msg = 'OK'
@@ -303,7 +304,12 @@ class UmkArticles(models.Model):
 
     def __str__(self):
         plan = self.get_plan_ochka()
-        return '#' + str(self.id) + ' ' + str(plan.discipline.name if len(plan.discipline.name)<15 else plan.discipline.name[0:35]+"...") + " " + str(plan.get_profiles()) + " {0} {1}а".format(plan.get_training_program_display(),plan.get_qualif_display())
+        return '#' + str(self.id) + ' ' + \
+               str(plan.discipline.name if len(plan.discipline.name)<15 else plan.discipline.name[0:35]+"...") + " " + \
+               str(plan.get_profiles()) + \
+               " {0} {1}а ".format(plan.get_training_program_display(),plan.get_qualif_display()) + \
+               "набор: {0}".format(plan.year)
+
 
 
 class UmkData(models.Model):

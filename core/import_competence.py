@@ -175,7 +175,7 @@ class CompetenceImport(object):
         for name in self.comp_list:
             comp_record = self.find_competence(name)
             indicators = self.table_indicators[name]
-            print(indicators['indicators_know'])
+            #print(indicators['indicators_know'])
 
             comp_new = Competence(name=name, direction=direc, full_content=comp_record['description'],
                                   should_know=comp_record['should_know'],

@@ -141,7 +141,7 @@ def remove_quotes(x):
 
 def previous_and_next_disciplines_from_umk(pl_ochka, Plans): #формирование списка предыдущих и последующих дисциплин
     num_semestr_ochka = numpy.sort(numpy.array(list(map(int, pl_ochka.semestr.split(",")))))
-    comps = set(pl_ochka.comps.split(" "))
+    comps = set(pl_ochka.comps.strip().split(" "))
 
     next_disciplines = set()
     previous_disciplines = set()
@@ -150,7 +150,8 @@ def previous_and_next_disciplines_from_umk(pl_ochka, Plans): #формирова
     for tmp in Plans.objects.filter(direction = pl_ochka.direction, training_form='fulltime', training_program = pl_ochka.training_program, year=pl_ochka.year):
         if (set(pl_ochka.profile.get_queryset()) == set(tmp.profile.get_queryset())) and (tmp.discipline!=pl_ochka.discipline):
             a = sorted(set(map(int, tmp.semestr.split(','))))
-            res = comps & set(tmp.comps.split(" "))
+            res = comps & set(tmp.comps.strip().split(" "))
+            #print(res, "  ", tmp.discipline, "  =",tmp.comps, "=",tmp.comps.split(" "))
             if res:
                 for i in a:
                     if numpy.greater(i,num_semestr_ochka).all(): #сравнение чтобы i больше всех элементов из num_semestr_ochka

@@ -119,7 +119,7 @@
 
 			var zachot_exam_tooltip = ["Оч.ф.обуч.: ","Заоч.ф.обуч.: ","Заоч.-ускорен.ф.обуч.: "];
             for(var i=0; i<3; i++) {
-                var tmp = exam_zachot[i].split(",");
+                var tmp = exam_zachot[i].split(";");
                 if (parseInt(tmp[0]) > 0) zachot_exam_tooltip[i] += "зачет в " + tmp[0] + " семестре;";
                 if (parseInt(tmp[1]) > 0) zachot_exam_tooltip[i] += "экзамен в " + tmp[1] + " семестре;";
             }

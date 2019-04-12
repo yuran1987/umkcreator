@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 from lxml import etree
 from docxtpl import DocxTemplate, Document
 from django.conf import settings
-from .generator_core import get_competens, get_predsedatel_spn, get_zaf_kaf, required_reconcil, get_table_sections_hours, html_to_docx, remove_htmk_tags
+from .generator_core import get_competens, get_predsedatel_spn, get_zaf_kaf_w_signature_pic, required_reconcil, get_table_sections_hours, html_to_docx, remove_htmk_tags
 from .tex_caller import TexLiveCaller
 #   Создание КОС
 
@@ -109,9 +109,8 @@ def get_other(doc_tpl, umkdata, ministerstvo, univer, unit, author,discipline, d
     else:
         return ''
 
-def context_KOS(umk, umkdata, plans, doc_tpl):
-    #1 Контролируемые компетенции
-    tbl_comps = get_competens(plans[0])
+def context_KOS(umk, umkdata, plans, tbl_comps, zaf_kaf, doc_tpl):
+    #1 tbl_comps - Контролируемые компетенции
 
     #2 Результаты освоения учебной дисциплины
     tbl_known = []
@@ -171,7 +170,7 @@ def context_KOS(umk, umkdata, plans, doc_tpl):
                'Units': umk.creator.deparmt.units.name,
                'kafedra': umk.creator.deparmt.name,
                'predsedatel_spn': {'fio': predsedatel_spn_ksn['fio'], 'position': predsedatel_spn_ksn['position']},
-               'zav_kaf': get_zaf_kaf(umk.creator.deparmt),
+               'zav_kaf': get_zaf_kaf_w_signature_pic(zaf_kaf,doc_tpl),
                'author': {'name': umk.creator.get_fullname(),
                           'position': umk.creator.get_position_display(),
                           'academic_degree': umk.creator.get_science_stepen_display(),
@@ -185,7 +184,7 @@ def context_KOS(umk, umkdata, plans, doc_tpl):
                'date':  "  ",
                'month': "  ",
                'year': plans[0].year,
-               'zav_kaf_req': required_reconcil(umk.creator, plans),
+               'zav_kaf_req': required_reconcil(plans),
                'tbl_comps': tbl_comps,
                'tbl_known': tbl_known,
                'tbl_can': tbl_can,
@@ -205,7 +204,7 @@ def context_KOS(umk, umkdata, plans, doc_tpl):
 
 
 
-def generation_exam_bilets(umk,umkdata,plans, myzip, directory):
+def generation_exam_bilets(umk,umkdata,plans, zaf_kav, myzip, directory):
     #Формирование экзаменационных билетов
     sets = str(umk.creator.sets)
     if re.search("bilets",sets): #в настройках включено формирование билетов
@@ -223,7 +222,6 @@ def generation_exam_bilets(umk,umkdata,plans, myzip, directory):
             loader=jinja2.FileSystemLoader(os.path.join(settings.BASE_DIR, "static/doc_templ/kos"))
         )
         template = latex_jinja_env.get_template('template_bilets.tex')
-        zaf_kav = get_zaf_kaf(plans[0].direction.deparmt)
 
         js = json.JSONDecoder()
         if umkdata.kos:
@@ -258,9 +256,14 @@ def generation_exam_bilets(umk,umkdata,plans, myzip, directory):
                                      }
 
                     # create a file and save the latex
-                    rp_file_object = NamedTemporaryFile(prefix="{0}-{1}-".format(plans[0].discipline,'экзаменационные билеты'), suffix='.pdf',dir=directory)  # create temp file
+                    rp_file_object = NamedTemporaryFile(prefix="{0}-{1}-".format(umk.get_short_name(),'экзаменационные билеты'), suffix='.tex',dir=directory)  # create temp file
                     #pypandoc.convert(template.render(template_vars), 'pdf', format='latex', outputfile=rp_file_object.name, extra_args=['--latex-engine=pdflatex'])
-                    t = TexLiveCaller(fnameout=rp_file_object.name)
-                    myzip.write(t.latex2pdf(template.render(template_vars)))
+                    fp = open(rp_file_object.name,"w")
+                    fp.write(template.render(template_vars))
+                    fp.close()
+                    myzip.write(rp_file_object.name)
+
+                    #t = TexLiveCaller(fnameout=rp_file_object.name)
+                    #myzip.write(t.latex2pdf(template.render(template_vars)))
                     #myzip.write(rp_file_object.name)
                     rp_file_object.close()

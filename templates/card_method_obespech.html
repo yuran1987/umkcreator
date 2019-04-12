@@ -1,0 +1,128 @@
+{% extends "base.html" %}{% load i18n crispy_forms_tags staticfiles%}
+
+{% block header_settings %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/js/jquery.jexcel.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/css/jquery.jexcel.min.css" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/js/jquery.jcalendar.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/1.5.0/css/jquery.jcalendar.min.css" type="text/css" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<style>
+    #panel {
+        height: 500px;
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+    #tablejexcel{
+        margin: 0 0 10px 0;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+    <div id="umk_core_content">
+        <center><h3>{{ title_form }}</h3></center>
+        <div id="panel">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <strong>{{ error|escape }}</strong><br />
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+             {% for error in form.non_field_errors %}
+                 <div class="alert alert-danger">
+                     <strong>{{ error|escape }}</strong>
+                 </div>
+             {% endfor %}
+            {% endif %}
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_block %}
+    <script type="text/javascript">
+    var num_row_total = 1;
+
+    function insertrow_lit(obj) {
+        num_row_total += 1;
+    }
+
+    function deleterow_lit(obj) {
+        num_row_total -= 1;
+    }
+
+
+//-------------------------------ЗАГРУЗКА----------------------------------------------------------
+$('#start_search').on('click', function () {
+
+    console.log($("#id_umk_src").val());
+
+    var urls = "get_lit_json/" + $("#id_umk_src").val() + "/";
+    console.log(urls);
+    var data;
+
+    $.getJSON(urls, function(data) {
+            if(data) {
+                var res = JSON.parse(data['table_literature']);
+
+                if (res.length > 1) {
+                    num_row_total = res.length - 1;
+                    console.log('num_row_total='+num_row_total);
+                    $('#tablejexcel').jexcel('setData', res);
+                    $('#tablejexcel').update();
+                }
+            }
+      console.log("success");
+    })
+    .fail(function() {
+      alert('В рабочей программе литература не найдена!');
+    });
+});
+
+
+//-------------------------------СОХРАНЕНИЕ----------------------------------------------------------
+$('#btn_save').on('click', function () {
+    data = $('#tablejexcel').jexcel('getData');
+    if(data.length>0) $('#id_data_field').val(JSON.stringify(data));
+});
+
+$('#btn_export').on('click', function () {
+    data = $('#tablejexcel').jexcel('getData');
+    if(data.length>0) $('#id_data_field').val(JSON.stringify(data));
+});
+
+
+$('#tablejexcel').jexcel({
+    data: [
+        ['Основная','','','','','','','','',''],
+        ['Дополнительная','','','','','','','','',''],
+    ],
+    colHeaders: ['№', 'Название учебной и учебно методической литературы, автор, изд-во', 'Год издания', 'Вид издания', 'Вид занятий', 'Кол-во экземпляров в БИК, шт.', 'Контингент', 'Обеспеченность, %', 'Место хранения', 'Наличие эл. варианта в ЭБС ТИУ'],
+    colWidths: [ 100, 200, 100, 100, 100, 120, 100, 50, 100, 100],
+    colAlignments: [ 'center', 'center', 'center','center', 'center', 'center','center', 'center', 'center', 'center' ],
+    tableOverflow:true,
+    oninsertrow:insertrow_lit,
+    ondeleterow:deleterow_lit,
+    allowInsertColumn:false,
+    columns: [
+              { type: 'text', wordWrap:true },
+              { type: 'text', wordWrap:true },
+              { type: 'numeric' },
+              { type: 'text', wordWrap:true },
+              { type: 'autocomplete', source:[ 'Лек','Практ','Лаб','Самост','КР','Лек.,Практ.','Лек.,Лаб.', 'Практ.,Лаб.', 'Лек.,Практ.,Лаб.' ] },
+              { type: 'text', wordWrap:true },
+              { type: 'text', wordWrap:true },
+              { type: 'text', wordWrap:true },
+              { type: 'text', wordWrap:true },
+              { type: 'text', wordWrap:true },
+             ]
+});
+    </script>
+    <script type="text/javascript" src="{% static 'js/bootstrap-tab.js' %}"></script>
+{% endblock %}

@@ -3,7 +3,7 @@ from enum import Enum
 import re
 from django.utils.timezone import datetime
 from .core_funcs import isNone,getSemestrs_2d,remove_dublicates,remove_quotes
-from .models import Plans, Directions, Profiles, Discipline
+from .models import Plans, Directions, Profiles, Discipline, Ministerstvo, Univercity
 
 class TypeEduPlan(Enum):
     FULLTIME = 0    #очная форма обучения
@@ -23,36 +23,62 @@ class PlanImport(object):#Класс для импорта учебного пл
         self.date_prikaz = date_prikaz
         self.departament = departament #название кафедры за которой закрепляется направление
         self.isUpdate = isUpdate #Включение/выключение режима обновления учебных планов
+        self.header_rows_max = 0 #номер строки в которой заканчивается поиск данных заголовка
+        self.rows = [0,0] # Диапазон строк в которых содержатся информация о дисциплинах и часах, компетенциях и т.д.
+
+        for j in range(1, self.ws.max_column):
+         for i in range(1, self.ws.max_row):
+            s = str(self.ws.cell(row=i, column=j).value).lower()
+            if re.search("план\s*учебного\s*процесса", s):
+                print("План учебного процесса col=",j," row=",i)
+                self.rows[0] = i
+            elif re.search("количество\s*экзаменов/зачетов/курсовых", s) or re.search("кол-во\s*экзаменов/зачетов/курсовых", s):
+                print("Конец плана col=",j," row=",i)
+                self.rows[1] = i
+            elif re.search("график\s*учебного\s*процесса", s) or re.search("заочная\s*форма\s*обучения", s): #
+                print("График учебного процесса col=",j," row=",i)
+                self.header_rows_max = i
+            elif re.search("наименование\s*дисциплины", s):
+                self.col_name_discipline = j
+                print("Номер столбца с дисциплиной col=", j)
+
+        for i in range(1, self.header_rows_max):
+            for j in range(1, self.ws.max_column):
+                tmp = self.ws.cell(row=i, column=j).value
+                if tmp:
+                    self.data_title.append(tmp)
 
         if self.type_edu==TypeEduPlan.FULLTIME:
-            self.rows = [42,self.ws.max_row]#Диапазон строк в которых содержатся информация о дисциплинах и часах, компетенциях и т.д.
-            self.col_name_discipline = 4
-            for i in range(3, 14):
-                for j in range(22, 69):
-                    tmp = self.ws.cell(row=i, column=j).value
-                    if tmp:
-                        self.data_title.append(tmp)
             print("choise FULLTIME")
-        elif self.type_edu==TypeEduPlan.EXTRAMURAL:
-            self.rows = [25, self.ws.max_row]#Диапазон строк в которых содержатся информация о дисциплинах и часах, компетенциях и т.д.
-            self.col_name_discipline = 3
-            for j in range(9, 45):
-                for i in range(4, 17):
-                    tmp = self.ws.cell(row=i, column=j).value
-                    if tmp:
-                        self.data_title.append(tmp)
-            print("choise EXTRAMURAL")
+        elif self.type_edu==TypeEduPlan.EXTRAMURAL or self.type_edu==TypeEduPlan.PART_TIME:
+            self.rows = [self.header_rows_max+1, self.ws.max_row]
+            print("choise {0}".format("EXTRAMURAL" if self.type_edu==TypeEduPlan.EXTRAMURAL else "PART-TIME"))
         else:
-            self.rows = [28, self.ws.max_row]
-            self.col_name_discipline = 3
-            for j in range(6, 39):
-                for i in range(4, 19):
-                    tmp = self.ws.cell(row=i, column=j).value
-                    if tmp:
-                        self.data_title.append(tmp)
-            print("choise PART-TIME")
+            print("choise unknown plan")
+            return -1
+
+        self.ministerstvo = self.get_ministerstvo()
+        self.univercity = self.get_univercity()
+
     def get_title_data(self):
         return self.data_title
+
+
+    def get_ministerstvo(self):#плдучить название министерства из учебного плана
+        res = ""
+        for i in range(len(self.data_title)):  # get direction
+            s = str(self.data_title[i])
+            if re.search(r'министерство', s.lower()):
+                res = s.lstrip()
+        return res
+
+    def get_univercity(self): #получить название университета из учебного плана
+        res = ""
+        for i in range(len(self.data_title)):  # get direction
+            s = str(self.data_title[i])
+            if re.search(r'учреждение', s.lower()):
+                res = s.lstrip()
+        return res
 
     def get_direction(self):
         res = []
@@ -70,7 +96,7 @@ class PlanImport(object):#Класс для импорта учебного пл
         res = 2000
         for i in range(len(self.data_title)):
             s = str(self.data_title[i])
-            if re.search(r'набор', s.lower()):
+            if re.search(r'набор', s.lower()) or re.search(r'год\s*начала\s*подготовки\s*по\s*учебному\s*плану', s.lower()):
                 res = int(re.findall(r"(\d{4})",s)[0])
         return res
 
@@ -96,21 +122,23 @@ class PlanImport(object):#Класс для импорта учебного пл
         for i in range(len(self.data_title)):
             s = str(self.data_title[i])
             if re.search(r'ПРОФИЛЬ:',s):
-                tmp = s.split(":")
-                if self.num_profiles==1:#one profile
-                    res.append(remove_quotes(tmp[1].lstrip()).capitalize())
-                else:#more profiles
-                    id = 0
-                    if tmp[1]:
-                        res.append(remove_quotes(tmp[1].lstrip()).capitalize())
-                    if self.type_edu == TypeEduPlan.FULLTIME:
-                        id=1
-                    elif self.type_edu==TypeEduPlan.EXTRAMURAL:
-                        id=1
-                    elif self.type_edu==TypeEduPlan.PART_TIME:
-                        id=0
-                    for j in range(1,self.num_profiles+id):
-                        res.append(remove_quotes(str(self.data_title[i+j]).lstrip()).capitalize())
+                tmp = s.split(":")[1]
+                # if self.num_profiles==1:#one profile
+                #     res.append(remove_quotes(tmp[1].lstrip()).capitalize())
+                # else:#more profiles
+                #     id = 0
+                #     if tmp[1]:
+                #         res.append(remove_quotes(tmp[1].lstrip()).capitalize())
+                #     if self.type_edu == TypeEduPlan.FULLTIME:
+                #         id=1
+                #     elif self.type_edu==TypeEduPlan.EXTRAMURAL:
+                #         id=1
+                #     elif self.type_edu==TypeEduPlan.PART_TIME:
+                #         id=0
+                #     for j in range(1,self.num_profiles+id):
+                #         res.append(remove_quotes(str(self.data_title[i+j]).lstrip()).capitalize())
+                for p in tmp.split(","):
+                    res.append(remove_quotes(p.strip()).capitalize())
         return res
 
 
@@ -152,9 +180,10 @@ class PlanImport(object):#Класс для импорта учебного пл
             if str(self.ws.cell(row=i, column=1).value).isdigit():
                 tmp = str(self.ws.cell(row=i, column=self.col_name_discipline).value).split(' или ')
                 for j in tmp:
-                    res.append(j.lstrip().capitalize())  # Название дисциплины
+                    if j and not j.isdigit():
+                        res.append(j.lstrip().capitalize())  # Название дисциплины
 
-        return remove_dublicates(res);
+        return remove_dublicates(res)
 
     def isProfilesCompare(self,current_row):
         prof = self.get_profiles()
@@ -176,14 +205,15 @@ class PlanImport(object):#Класс для импорта учебного пл
                         res = p
         return res
 
-    def import_plan_of_dis_fulltime(self,ids, direction, weeks_in_semestrs): #добавление учебного плана для очной формы обучения
+    def import_plan_of_dis_fulltime(self,ids, direction, weeks_in_semestrs, base_part_row): #добавление учебного плана для очной формы обучения
 
         current_profile = self.get_profiles()
-        for i in range(self.rows[0], self.rows[1]):
+        for i in range(base_part_row, self.rows[1]):
              if str(self.ws.cell(row=i, column=1).value).isdigit():
                  code_opop = self.ws.cell(row=i, column=ids[0]).value              #Код ОПОП
                  names = str(self.ws.cell(row=i, column=ids[1]).value).split(" или ")                   #Название дисциплины
-                 competense = str(self.ws.cell(row=i, column=ids[16]).value).split("/")  # Коды формируемых компетенций
+                 competense = re.split('/|или',str(self.ws.cell(row=i, column=ids[16]).value))  # Коды формируемых компетенций
+
                  for nm in range(len(names)):
                      #ищим дисциплину names[j] из базы
                      total_hour = self.ws.cell(row=i, column=ids[2]).value             #Трудоемкость
@@ -221,7 +251,8 @@ class PlanImport(object):#Класс для импорта учебного пл
                          for prof in current_profile:
                             tmp = Profiles.objects.filter(name=prof, direction_id=direction) # direction=Directions.objects.get(code=self.get_direction()[0])
                             for j in tmp:
-                                prof_new.append(j)
+                                if j not in prof_new:
+                                    prof_new.append(j)
 
                          for plan in pl:
                             if(list(plan.profile.all())==prof_new): #сравнение профилей
@@ -240,7 +271,7 @@ class PlanImport(object):#Класс для импорта учебного пл
                                 plan.zachot_semestr = zachot
                                 plan.kursovya_work_project = KPKR
                                 plan.zanatiya_in_interak_forms_hours = interaktiv_form_hour
-                                plan.comps = competense[nm if len(competense) > 1 else 0]
+                                plan.comps = competense[nm if len(competense) > 1 else 0].strip()
                                 plan.weeks_count_in_semestr = ",".join(weeks)
                                 plan.save()
                                 print("Обновлен уч. план для", "    ", plan)
@@ -265,8 +296,10 @@ class PlanImport(object):#Класс для импорта учебного пл
                                      zachot_semestr = zachot,
                                      kursovya_work_project = KPKR,
                                      zanatiya_in_interak_forms_hours = interaktiv_form_hour,
-                                     comps = competense[nm if len(competense)>1 else 0],
-                                     weeks_count_in_semestr = ",".join(weeks)
+                                     comps = competense[nm if len(competense)>1 else 0].strip(),
+                                     weeks_count_in_semestr = ",".join(weeks),
+                                     ministerstvo=Ministerstvo.objects.get(name=self.ministerstvo),
+                                     univer=Univercity.objects.get(name=self.univercity)
                                      )
                           p.save()
                           print(names[nm])
@@ -283,10 +316,10 @@ class PlanImport(object):#Класс для импорта учебного пл
 
     def import_plan_of_dis_exramural(self,code_opop_id, discipline_name_id, total_id, zachot_edinic_id, audit_sum_id, \
                                      hour_lec_id, hour_prakt_id, hour_labs_id, exam_id, zachot_id, KR_id, \
-                                     kursovoi_proekt_id, kursovoi_rabota_id,direction):
+                                     kursovoi_proekt_id, kursovoi_rabota_id,direction, base_part_row):
         current_profile = self.get_profiles()
 
-        for i in range(self.rows[0], self.rows[1]):
+        for i in range(base_part_row, self.rows[1]):
              if str(self.ws.cell(row=i, column=1).value).isdigit():
                  code_opop = self.ws.cell(row=i, column=code_opop_id).value              #Код ОПОП
                  names = str(self.ws.cell(row=i, column=discipline_name_id).value).split(" или ")                   #Название дисциплины
@@ -324,7 +357,8 @@ class PlanImport(object):#Класс для импорта учебного пл
                          for prof in current_profile:
                              tmp = Profiles.objects.filter(name=prof,direction_id=direction)
                              for j in tmp:
-                                 prof_new.append(j)
+                                 if j not in prof_new:
+                                     prof_new.append(j)
 
                          for plan in pl:
                              if (list(plan.profile.all()) == prof_new):  # сравнение профилей
@@ -366,7 +400,9 @@ class PlanImport(object):#Класс для импорта учебного пл
                                    exam_semestr=exam,
                                    zachot_semestr=zachot,
                                    kursovya_work_project=KPKR,
-                                   kontrolnaya_work=KP
+                                   kontrolnaya_work=KP,
+                                   ministerstvo=Ministerstvo.objects.get(name=self.ministerstvo),
+                                   univer=Univercity.objects.get(name=self.univercity)
                                    )
                          p.save()
                          for prof in current_profile:
@@ -400,26 +436,30 @@ class PlanImport(object):#Класс для импорта учебного пл
                 tmp = Discipline(name=d)
                 tmp.save()
 
-        if self.type_edu==TypeEduPlan.FULLTIME:
-            #for j in range(1, 5):
-            #    for i in range(1, self.ws.max_row):
-            #        if re.search("план\s*учебного\s*процесса", str(self.ws.cell(row=i, column=j).value).lower()):
-            #            print("res col=",i," row=",j)
-
-            num_cols = [2,34]
-            num_rows = [32,40]
-        elif self.type_edu==TypeEduPlan.EXTRAMURAL:
-            num_cols = [2, 15]
-            num_rows = [16, 23]
-        elif self.type_edu==TypeEduPlan.PART_TIME:
-            num_cols = [2, 15]
-            num_rows = [0, 0]
-            for i in range(1, 26):
-                s = str(self.ws.cell(row=i, column=1).value)
-                if re.search(r"№", s) and num_rows[0]==0:
-                    num_rows[0] = i
-                elif re.search(r"\d", s) and num_rows[1]==0:
+        num_cols = [1, 0]
+        num_rows = [self.rows[0], 0]
+        for j in range(1, self.ws.max_column):
+            for i in range(self.rows[0], self.rows[1]):
+                s = str(self.ws.cell(row=i, column=j).value)  #
+                if re.search(r"кп\s*/\s*кр", s.lower()) or re.search(r"объем\s*работ,\s*час", s.lower()):
+                    num_cols[1] = j+1
+                    if self.type_edu != TypeEduPlan.FULLTIME:
+                        num_cols[1] = j + 4
+                    print("КП/КР  col=", j)
+                    break
+                elif re.search(r"базовая\s*часть", s.lower()):
                     num_rows[1] = i
+                    print("базовая часть row=", i)
+                    break
+                elif re.search(r"интерактивной", s.lower()):
+                    hours_interaktiv_id = j
+                    print(str(j) + "  " + s)
+                elif re.search(r"коды формируемых компетенций", s.lower()):
+                    code_kompetence_id = j
+                    print(str(j) + "  " + s)
+                elif re.search(r"недель\s*в\s*семестре", s.lower()):
+                    week_in_semestr_cell = [i, j]
+                    print(str(j) + "  " + s)
 
         tmp_bez_prepod = ["",0]
         kursovoi_flag=False
@@ -458,7 +498,7 @@ class PlanImport(object):#Класс для импорта учебного пл
                     kursovoi_rabota_id = j
                     kursovoi_flag = False
                     print(str(j) + "  " + s)
-                elif re.search(r"Объем работ, час",s) or re.search(r"аудиторная работа",s):#Всего аудиторных часов
+                elif re.search(r"Объем работ,\s*час",s) or re.search(r"аудиторная\s*работа",s) or re.search(r"контактная\s*работа", s):#Всего аудиторных часов
                     audit_sum_id = j
                     print(str(j) + "  " + s)
                 elif re.search(r"лек.",s.lower()):#Лекций,час.
@@ -494,50 +534,36 @@ class PlanImport(object):#Класс для импорта учебного пл
                         tmp_bez_prepod[1] = j if (tmp_bez_prepod[1] % j) == 0 else 0xFF
 
         if self.type_edu==TypeEduPlan.FULLTIME:
-            for j in range(2,77):
-                for i in range(num_rows[0],num_rows[1]):
-                    s = str(self.ws.cell(row=i, column=j).value)
-                    if re.search(r"интерактивной", s.lower()):
-                        hours_interaktiv_id = j
-                        print(str(j) + "  " + s)
-                    elif re.search(r"коды формируемых компетенций", s.lower()):
-                        code_kompetence_id = j
-                        print(str(j) + "  " + s)
-                    elif re.search(r"недель\s*в\s*семестре", s.lower()):
-                        week_in_semestr_id = [i,j]
-                        print(str(j) + "  " + s)
-
             week_in_semestr = []
-            for i in range(week_in_semestr_id[1], 77):
-                s = str(self.ws.cell(row=week_in_semestr_id[0]+1, column=i).value)
-                if re.search(r"\d+", s.lower()):
-                    print(str(i) + "  " + s)
-                    week_in_semestr.append(s)
-
-
-
+            for i in range(week_in_semestr_cell[1], self.ws.max_column):
+                 s = str(self.ws.cell(row=week_in_semestr_cell[0]+1, column=i).value)
+                 if s.isdigit():
+                     if re.search(r"\d+", s.lower()):
+                         print(str(i) + "  " + s)
+                         week_in_semestr.append(s)
             if tmp_bez_prepod[1] != 0xFF:
                 samost_without_prepod_id = tmp_bez_prepod[1]
 
             self.import_plan_of_dis_fulltime(ids = [code_opop_id,discipline_name_id,total_id,zachot_edinic_id,
-                                                    audit_sum_id, hour_lec_id, hour_prakt_id, hour_labs_id,
-                                                    samost_sum_id, samost_without_prepod_id, samost_with_stud_id,
-                                                    samost_with_group_id, exam_id, zachot_id, KPKR_id,
-                                                    hours_interaktiv_id, code_kompetence_id], direction=Directions.objects.get(code=directs[0]).id,
-                                                    weeks_in_semestrs=week_in_semestr)
+                                                     audit_sum_id, hour_lec_id, hour_prakt_id, hour_labs_id,
+                                                     samost_sum_id, samost_without_prepod_id, samost_with_stud_id,
+                                                     samost_with_group_id, exam_id, zachot_id, KPKR_id,
+                                                     hours_interaktiv_id, code_kompetence_id], direction=Directions.objects.get(code=directs[0]).id,
+                                                     weeks_in_semestrs=week_in_semestr, base_part_row = num_rows[1])
         elif self.type_edu==TypeEduPlan.EXTRAMURAL or self.type_edu==TypeEduPlan.PART_TIME:
             self.import_plan_of_dis_exramural(code_opop_id = code_opop_id,
-                                              discipline_name_id = discipline_name_id,
-                                              total_id=total_id,
-                                              zachot_edinic_id=zachot_edinic_id,
-                                              audit_sum_id=audit_sum_id,
-                                              hour_lec_id=hour_lec_id,
-                                              hour_prakt_id=hour_prakt_id,
-                                              hour_labs_id=hour_labs_id,
-                                              exam_id=exam_id,
-                                              zachot_id=zachot_id,
-                                              KR_id=KR_id,
-                                              kursovoi_proekt_id=kursovoi_proekt_id,
-                                              kursovoi_rabota_id=kursovoi_rabota_id,
-                                              direction=Directions.objects.get(code=directs[0]).id)
+                                               discipline_name_id = discipline_name_id,
+                                               total_id=total_id,
+                                               zachot_edinic_id=zachot_edinic_id,
+                                               audit_sum_id=audit_sum_id,
+                                               hour_lec_id=hour_lec_id,
+                                               hour_prakt_id=hour_prakt_id,
+                                               hour_labs_id=hour_labs_id,
+                                               exam_id=exam_id,
+                                               zachot_id=zachot_id,
+                                               KR_id=KR_id,
+                                               kursovoi_proekt_id=kursovoi_proekt_id,
+                                               kursovoi_rabota_id=kursovoi_rabota_id,
+                                               direction=Directions.objects.get(code=directs[0]).id,
+                                               base_part_row = num_rows[1])
 

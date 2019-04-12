@@ -43,5 +43,7 @@ urlpatterns = [
     url(r'^umk/kos/edit_referat/(?P<id>(\d+))/$',views.edit_kos,{'title':'Темы рефератов (эссе, докладов, сообщений)','kos_id':'themes_referat'},name='kos_referat'),
     url(r'^umk/kos/edit_zadachi/(?P<id>(\d+))/$',views.edit_kos,{'title':'Комплект разноуровневых заданий (задач)','kos_id':'reshenie_zadach'},name='kos_zadachi'),
     url(r'^zapolnenie/$', views.zapolnenie),
+    url(r'^generation_card_method_obespech/$',views.generation_card_method_obespech, name='KMO_work'),
+    url(r'^generation_card_method_obespech/get_lit_json/(?P<umk_id>(\d+))/$', views.get_literature_json, name='get_literature_json'),
     url(r'^$', views.index, name = 'index.html'),
 ]

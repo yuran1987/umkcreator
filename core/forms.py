@@ -94,17 +94,10 @@ class addDatafor_core(forms.ModelForm):
         self.fields['database_info_system'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
         self.fields['software_lic'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
 
-    def save(self, id, umk_id, table_prakt_hour, table_laborat_hour, table_rating_ochka, table_rating_zaochka, table_literature, commit=True):
+    def save(self, commit=True):
         instance = super(addDatafor_core, self).save(commit=False)
-        instance.id = id
-        instance.umk_id = umk_id
         instance.umk_id.status = 'edit'
         instance.umk_id.save()
-        instance.table_prakt_hour = table_prakt_hour
-        instance.table_laborat_hour = table_laborat_hour
-        instance.table_rating_ochka = table_rating_ochka
-        instance.table_rating_zaochka = table_rating_zaochka
-        instance.table_literature = table_literature
 
         if commit:
             instance.save()
@@ -112,7 +105,7 @@ class addDatafor_core(forms.ModelForm):
 
     class Meta:
         model = UmkData
-        exclude = ['umk_id','table_prakt_hour','table_laborat_hour', 'table_rating_ochka', 'table_rating_zaochka', 'table_literature']
+        exclude = ['umk_id','table_prakt_hour','table_laborat_hour', 'table_rating_ochka', 'table_rating_zaochka', 'table_literature', 'kos']
 
 class addDatafor_addons_form(forms.Form):
     data_field = forms.CharField(widget = forms.Textarea(),required = False)
@@ -176,6 +169,26 @@ class literature_form(forms.Form):
     class Meta:
         fields = ['data_field','liters_list','liter_search']
 
+
+class card_method_obespech(forms.Form):
+    data_field = forms.CharField(widget=forms.Textarea(), required=False)
+    umk_src = forms.ModelChoiceField(queryset=UmkArticles.objects.all(),help_text=u'Выберете рабочую программу к которой хотите сделать карту мед. обес.',
+                                     label=u'Рабочая программа:')
+
+    def __init__(self, *args, **kwargs):
+        super(card_method_obespech, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(Div(FieldWithButtons('umk_src', Button('bchoosen', "Выбрать", css_id='start_search'))), Div(css_id='tablejexcel'),
+            Div('data_field')),
+            FormActions(Submit('export', u'Сформировать', css_class="btn-primary", css_id='btn_export'), #
+                        Submit('save', u'Сохранить', css_class="btn-success", css_id='btn_save'),
+                        Submit('cancel', u'Назад'))
+        )
+        self.fields['data_field'].widget = forms.HiddenInput()
+
+    class Meta:
+        fields = ['data_field','umk_src']
 
 
 ################################################################################
