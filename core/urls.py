@@ -42,8 +42,10 @@ urlpatterns = [
     url(r'^umk/kos/edit_kontr_work/(?P<id>(\d+))/$',views.edit_kos,{'title':'Комплект заданий для контрольной работы','kos_id':'zad_konr_rabot'},name='kos_kontr_work'),
     url(r'^umk/kos/edit_referat/(?P<id>(\d+))/$',views.edit_kos,{'title':'Темы рефератов (эссе, докладов, сообщений)','kos_id':'themes_referat'},name='kos_referat'),
     url(r'^umk/kos/edit_zadachi/(?P<id>(\d+))/$',views.edit_kos,{'title':'Комплект разноуровневых заданий (задач)','kos_id':'reshenie_zadach'},name='kos_zadachi'),
-    url(r'^zapolnenie/$', views.zapolnenie),
+    url(r'^umk/kos/edit_kolokvium_opros/(?P<id>(\d+))/$',views.edit_kos,{'title':'Вопросы для коллоквиумов, собеседований, опроса','kos_id':'voprosy_k_kolokvium_sobesedv'},name='kos_quest_kolokvium'),
+    #url(r'^zapolnenie/$', views.zapolnenie),
     url(r'^generation_card_method_obespech/$',views.generation_card_method_obespech, name='KMO_work'),
     url(r'^generation_card_method_obespech/get_lit_json/(?P<umk_id>(\d+))/$', views.get_literature_json, name='get_literature_json'),
+
     url(r'^$', views.index, name = 'index.html'),
 ]

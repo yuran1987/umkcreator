@@ -174,12 +174,13 @@ class card_method_obespech(forms.Form):
     data_field = forms.CharField(widget=forms.Textarea(), required=False)
     umk_src = forms.ModelChoiceField(queryset=UmkArticles.objects.all(),help_text=u'Выберете рабочую программу к которой хотите сделать карту мед. обес.',
                                      label=u'Рабочая программа:')
+    year = forms.ChoiceField(choices=([x, x] for x in reversed(range(2014, datetime.now().year+1))), help_text=u'Выберете год формирования', label=u'Год')
 
     def __init__(self, *args, **kwargs):
         super(card_method_obespech, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.layout = Layout(
-            Row(Div(FieldWithButtons('umk_src', Button('bchoosen', "Выбрать", css_id='start_search'))), Div(css_id='tablejexcel'),
+            Row(Div(FieldWithButtons('umk_src', Button('bchoosen', "Выбрать", css_id='start_search'))), Div('year',css_class="col-md-2 col-xs-3"), Div(css_id='tablejexcel'),
             Div('data_field')),
             FormActions(Submit('export', u'Сформировать', css_class="btn-primary", css_id='btn_export'), #
                         Submit('save', u'Сохранить', css_class="btn-success", css_id='btn_save'),
@@ -188,7 +189,7 @@ class card_method_obespech(forms.Form):
         self.fields['data_field'].widget = forms.HiddenInput()
 
     class Meta:
-        fields = ['data_field','umk_src']
+        fields = ['data_field','umk_src', 'year']
 
 
 ################################################################################

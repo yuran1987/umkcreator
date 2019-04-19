@@ -60,10 +60,12 @@ def get_other(doc_tpl, umkdata, ministerstvo, univer, unit, author,discipline, d
         kos = js.decode(umkdata.kos)
         tempfiles_list = []
 
-        if kos['reshenie_zadach']:
-            tempfiles_list.append(get_type_kos('Комплект задач (заданий)', 'reshenie_zadach', ministerstvo, univer, unit, author,discipline, kos, date))
+        if kos['tekushii_kontrol']:
+            tempfiles_list.append(get_type_kos('Типовые задания для текущего контроля', 'tekushii_kontrol', ministerstvo, univer, unit, author,discipline, kos, date))
         if kos['zad_konr_rabot']:
             tempfiles_list.append(get_type_kos('Комплект заданий для контрольной работы', 'zad_konr_rabot', ministerstvo, univer, unit, author,discipline, kos, date))
+        if kos['reshenie_zadach']:
+            tempfiles_list.append(get_type_kos('Комплект задач (заданий)', 'reshenie_zadach', ministerstvo, univer, unit, author,discipline, kos, date))
         if kos['themes_referat']:
             tempfiles_list.append(get_type_kos('Темы рефератов', 'themes_referat', ministerstvo, univer, unit, author,discipline, kos, date))
         if kos['voprosy_k_exameny']:
@@ -74,6 +76,10 @@ def get_other(doc_tpl, umkdata, ministerstvo, univer, unit, author,discipline, d
             tempfiles_list.append(get_type_kos('Примерные задания для лабораторной работы', 'zad_lab_rab', ministerstvo, univer, unit, author,discipline, kos, date))
         if kos['zad_prakt_rab']:
             tempfiles_list.append(get_type_kos('Примерные задания для практической работы', 'zad_prakt_rab', ministerstvo, univer, unit, author,discipline, kos, date))
+
+        if 'voprosy_k_kolokvium_sobesedv' in kos.keys():
+            if kos['voprosy_k_kolokvium_sobesedv']:
+                tempfiles_list.append(get_type_kos('Вопросы для коллоквиумов, собеседований, опроса', 'voprosy_k_kolokvium_sobesedv', ministerstvo, univer, unit, author, discipline, kos, date))
 
         #обьединение файлов docx
         merged_document = Document()
@@ -157,7 +163,7 @@ def context_KOS(umk, umkdata, plans, tbl_comps, zaf_kaf, doc_tpl):
     forms_controlya = " ".join(forms_controlya)
 
     tbl_control = []
-    step_bal = 100/(len(tbl_secs)-1)
+    step_bal = round(100/(len(tbl_secs)-1))
 
     for id in range(len(tbl_secs)-1):
         item = tbl_secs[id]

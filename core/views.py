@@ -403,7 +403,7 @@ def generation_card_method_obespech(request):
                 umkdata.umk_id.save()
                 umkdata.save()
             elif 'export' in request.POST.keys():
-                return generation_meth_obespech(form.cleaned_data['umk_src'].id, form.cleaned_data['data_field'])
+                return generation_meth_obespech(form.cleaned_data['umk_src'].id, form.cleaned_data['data_field'], form.cleaned_data['year'])
 
             return HttpResponseRedirect(reverse('KMO_work'))
     else:
@@ -448,8 +448,15 @@ def actions(request, type, id=0):
 def edit_kos(request,title,kos_id, id):
     umkdata = UmkData.objects.get(umk_id_id=id)
     js_de = json.JSONDecoder()
-    kos = js_de.decode(umkdata.kos) if umkdata.kos else {'tekushii_kontrol': '', 'zad_konr_rabot': '', 'reshenie_zadach': '', 'themes_referat': '', 'voprosy_k_exameny': '', 'voprosy_k_zachoty': '',
-                                                         'zad_lab_rab': '', 'zad_prakt_rab': ''}
+    kos = js_de.decode(umkdata.kos) if umkdata.kos else {'tekushii_kontrol': '',
+                                                         'zad_konr_rabot': '',
+                                                         'reshenie_zadach': '',
+                                                         'themes_referat': '',
+                                                         'voprosy_k_exameny': '',
+                                                         'voprosy_k_zachoty': '',
+                                                         'zad_lab_rab': '',
+                                                         'zad_prakt_rab': '',
+                                                         'voprosy_k_kolokvium_sobesedv': ''}
 
     if request.method == 'POST':
         form = form_kos(request.POST)
@@ -462,6 +469,8 @@ def edit_kos(request,title,kos_id, id):
             print("Post Save: ", umkdata.kos)
             return HttpResponseRedirect(reverse('kos_menu',kwargs={'id': id}))
     else:
+        if kos_id not in kos:
+            kos.update({kos_id: ''})
         form = form_kos(initial={'data_field': kos[kos_id] if kos else ''})
         form.fields['data_field'].label = title
 
@@ -490,6 +499,8 @@ def kos_menu(request, id):
             return {'url': "kos_referat", 'name': 'Темы докладов'}
         elif re.search("задач", item):
             return {'url': "kos_zadachi", 'name': 'Комплект разноуровневых заданий (задач)'}
+        elif re.search("работа на лекциях", item):
+            return {'url': "kos_quest_kolokvium", 'name': 'Вопросы для коллоквиумов, собеседований, опроса'}
 
 
     if umkdata.table_rating_ochka:

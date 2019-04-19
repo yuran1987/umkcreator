@@ -121,6 +121,21 @@ def get_zaf_kaf(deparmt):#получаем ФИО зав кафедрой
 
     return res
 
+def get_user_fio_w_signature(position, units): #positon - должность units - подразделение (филиал ТИУ )
+    user = User.objects.filter(position=position, deparmt__units=units)
+    res = {"name": '', "position": '', 'science_stepen': '', 'science_zvanie': '', 'signature': ''}
+
+    for u in user:
+        res = {'name': "{0} {1}. {2}.".format(u.last_name, u.first_name[0], u.patronymic[0]),
+               'position': u.get_position_display().capitalize(),
+               'science_stepen': u.get_science_stepen_display(),
+               'science_zvanie': u.get_science_zvanie_display(),
+               'signature': u.electronic_signature  # цифровая подпись
+               }
+    return res
+
+
+
 def get_predsedatel_spn(deparmt):#председатель СПН
     user = User.objects.filter(deparmt=deparmt)
     res = {'fio':'', 'position': ''}

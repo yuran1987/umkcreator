@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile, TemporaryDirectory, gettempdir
 from docxtpl import DocxTemplate, RichText
 from .models import Plans, UmkArticles, UmkData, Competence, User
 from .generator_kos import context_KOS, generation_exam_bilets
-from .generator_core import get_predsedatel_spn, get_zaf_kaf, get_zaf_kaf_w_signature_pic,  get_course, isEmptyValOrStr, get_hour_kursovaya_work_or_project, required_reconcil, html_to_docx, \
+from .generator_core import get_predsedatel_spn, get_zaf_kaf, get_zaf_kaf_w_signature_pic, get_user_fio_w_signature, get_course, isEmptyValOrStr, get_hour_kursovaya_work_or_project, required_reconcil, html_to_docx, \
             get_OPOP_of_discipline, get_placeInStructOPOP,get_competens,get_competens_list, get_table_contentsection,get_table_interdisciplinary_relations, get_table_sections_hours, \
             get_table_lections_hours,get_table_labs_prakt, get_table_samost_hours, get_table_literature, get_table_literature_from_json,  get_table_rating_day, get_table_rating_night, isEmptyVal
 #-------------------------------------------------------------------------------------------
@@ -266,7 +266,7 @@ def generation_docx_achive(id_list):
 
 
 
-def generation_meth_obespech(id , tbl_lit_json):#формирование карты метод. обеспечения
+def generation_meth_obespech(id , tbl_lit_json, year=datetime.now().year):#формирование карты метод. обеспечения
     umkdata = UmkData.objects.get(umk_id=id)
     umk = umkdata.umk_id
     plans = umk.get_plan_list()
@@ -280,9 +280,10 @@ def generation_meth_obespech(id , tbl_lit_json):#формирование кар
     document.render(context = {
        'kafedra': umk.creator.deparmt.name,
        'zav_kaf': get_zaf_kaf_w_signature_pic(zaf_kaf,document),
+       'bibliotekar': get_user_fio_w_signature('bibliotekar', umk.creator.deparmt.units),
        'Discipline': plans[0].get_discipline(),
        'direction': plans[0].get_direction(),
-       'year': plans[0].year,
+       'year': year,
        'crs_och': get_course(plans[0].get_semestrs()),
        'crs_z': get_course(plans[1].get_semestrs())  if plans[1] is not None else "-",
        'crs_zu': get_course(plans[2].get_semestrs()) if plans[2] is not None else "-",
@@ -295,6 +296,8 @@ def generation_meth_obespech(id , tbl_lit_json):#формирование кар
 
     res = HttpResponse(rp_file_object.file, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     fname = transliterate.translit("{0}-{1}-КМО.docx".format(code_OPOP,umkname.replace(" ","_")),"ru", reversed=True)
+    if len(fname)>100:
+        fname = "result-KMO.docx"
 
     res['Content-Disposition'] = 'attachment; filename='+fname
     res['Content-Length'] = os.path.getsize(rp_file_object.name)

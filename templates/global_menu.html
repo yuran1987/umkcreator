@@ -44,6 +44,9 @@
                         {% if user.position == 'io_zaf_kaf' or user.position == 'zaf_kaf' %}
                             <li><a href="{% url 'umklistsign'  %}">На подпись</a></li>
                         {% endif %}
+                        {% if user.is_superuser %}
+                            <li><a href="{% url 'admin:index' %}">Администрирование</a></li>
+                        {% endif %}
                         <li><a href="{% url 'auth_logout' %}">{% trans "Log out" %}</a></li>
                         <li><a href="{% url 'auth_password_change' %}">{% trans "Change password" %}</a></li>
                 {% else %}
