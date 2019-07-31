@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^tinymce/', include('tinymce.urls')),
     url('', include('core.urls')),
     url('^utils', include('utils.urls')),
+    url('^pubs', include('pubs_parser.urls')),
 ]
 
 #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

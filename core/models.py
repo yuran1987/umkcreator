@@ -442,6 +442,8 @@ class User(AbstractUser):
      science_zvanie = models.CharField(choices=sci_zvaniya, default='no', max_length=255,verbose_name="Ученое звание")
      electronic_signature = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name=u'Электронная подпись')
      sets = models.CharField(blank = True, null=True, max_length=255, verbose_name="Настройки")
+     scopus_id = models.CharField(blank = True, null=True, max_length=255, verbose_name="Scopus ID")
+     elibrary_id = models.CharField(blank = True, null=True, max_length=255, verbose_name="Elibrary ID", help_text="authorid from url")
 
      def get_patronymic(self):
         return self.patronymic

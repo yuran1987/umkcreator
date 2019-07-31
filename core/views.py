@@ -72,7 +72,9 @@ class UserProfileEditView(UpdateView):
                    science_zvanie = form.cleaned_data['science_zvanie'],
                    electronic_signature = form.cleaned_data['electronic_signature'],
                    email = form.cleaned_data['email'],
-                   sets = form.cleaned_data['sets'])
+                   sets = form.cleaned_data['sets'],
+                   scopus_id = form.cleaned_data['scopus_id'],
+                   elibrary_id = form.cleaned_data['elibrary_id'])
          return HttpResponseRedirect(reverse("profile", kwargs={"slug": self.request.user}))
 
 def User_password_changed(request):

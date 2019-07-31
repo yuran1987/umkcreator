@@ -2,38 +2,37 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="11e827b1-e485-4c5e-aa73-f67ed07e0d9d" name="Default" comment="1) добавлена модель для Министерства&#10;2) в модель пользователя добавлена должность &quot;председатель СПН&quot;, поле настроек&#10;3) генерирование экзаменационных билетов&#10;4) в форме сохранения профиля пользователя исправлена функция сохранения">
-      <change beforePath="" afterPath="$PROJECT_DIR$/avatars/nekrasov.png" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0002_auto_20190213_0035.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0003_auto_20190213_0036.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0004_remove_univercity_ministerstvo.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0005_auto_20190213_0054.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0006_user_sets.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0007_auto_20190213_1558.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0008_auto_20190221_1215.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0009_auto_20190221_1258.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0010_auto_20190221_1302.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0011_auto_20190221_1626.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0012_auto_20190221_1634.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0013_auto_20190221_2019.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0014_auto_20190314_2058.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/templates/card_method_obespech.html" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0002_auto_20190730_1743.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0003_auto_20190730_1753.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0004_auto_20190730_1755.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/core/migrations/0005_auto_20190730_1802.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/__init__.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/admin.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/apps.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/elibrary_parser.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/migrations/0001_initial.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/migrations/0002_auto_20190723_2143.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/migrations/0003_auto_20190730_1740.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/migrations/0004_publications_year.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/migrations/__init__.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/models.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/scopus_parser.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/urls.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/pubs_parser/views.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/static/img/favicon.ico" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/core/core_funcs.py" afterPath="$PROJECT_DIR$/core/core_funcs.py" />
-      <change beforePath="$PROJECT_DIR$/core/docxpdf_generator.py" afterPath="$PROJECT_DIR$/core/docxpdf_generator.py" />
+      <change beforePath="$PROJECT_DIR$/core/apps.py" afterPath="$PROJECT_DIR$/core/apps.py" />
       <change beforePath="$PROJECT_DIR$/core/forms.py" afterPath="$PROJECT_DIR$/core/forms.py" />
-      <change beforePath="$PROJECT_DIR$/core/generator_core.py" afterPath="$PROJECT_DIR$/core/generator_core.py" />
-      <change beforePath="$PROJECT_DIR$/core/generator_kos.py" afterPath="$PROJECT_DIR$/core/generator_kos.py" />
-      <change beforePath="$PROJECT_DIR$/core/import_competence.py" afterPath="$PROJECT_DIR$/core/import_competence.py" />
-      <change beforePath="$PROJECT_DIR$/core/import_plans.py" afterPath="$PROJECT_DIR$/core/import_plans.py" />
       <change beforePath="$PROJECT_DIR$/core/migrations/0001_initial.py" afterPath="$PROJECT_DIR$/core/migrations/0001_initial.py" />
       <change beforePath="$PROJECT_DIR$/core/migrations/0006_umkdata_kos.py" afterPath="" />
       <change beforePath="$PROJECT_DIR$/core/models.py" afterPath="$PROJECT_DIR$/core/models.py" />
-      <change beforePath="$PROJECT_DIR$/core/urls.py" afterPath="$PROJECT_DIR$/core/urls.py" />
       <change beforePath="$PROJECT_DIR$/core/views.py" afterPath="$PROJECT_DIR$/core/views.py" />
       <change beforePath="$PROJECT_DIR$/static/doc_templ/kos/template_bilets.tex" afterPath="$PROJECT_DIR$/static/doc_templ/kos/template_bilets.tex" />
-      <change beforePath="$PROJECT_DIR$/static/doc_templ/template_annotation.docx" afterPath="$PROJECT_DIR$/static/doc_templ/template_annotation.docx" />
-      <change beforePath="$PROJECT_DIR$/templates/edit_umk.html" afterPath="$PROJECT_DIR$/templates/edit_umk.html" />
-      <change beforePath="$PROJECT_DIR$/templates/global_menu.html" afterPath="$PROJECT_DIR$/templates/global_menu.html" />
+      <change beforePath="$PROJECT_DIR$/static/doc_templ/template_card_method_obespech.docx" afterPath="$PROJECT_DIR$/static/doc_templ/template_card_method_obespech.docx" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" afterPath="$PROJECT_DIR$/templates/base.html" />
+      <change beforePath="$PROJECT_DIR$/templates/registration/profile.html" afterPath="$PROJECT_DIR$/templates/registration/profile.html" />
+      <change beforePath="$PROJECT_DIR$/umksite/settings.py" afterPath="$PROJECT_DIR$/umksite/settings.py" />
+      <change beforePath="$PROJECT_DIR$/umksite/urls.py" afterPath="$PROJECT_DIR$/umksite/urls.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -50,76 +49,48 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/core/views.py">
+      <file leaf-file-name="elibrary_parser.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pubs_parser/elibrary_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="56">
-              <caret line="398" column="23" lean-forward="false" selection-start-line="398" selection-start-column="23" selection-end-line="398" selection-end-column="23" />
+            <state relative-caret-position="-2448">
+              <caret line="11" column="41" lean-forward="true" selection-start-line="11" selection-start-column="41" selection-end-line="11" selection-end-column="41" />
               <folding>
-                <element signature="e#0#90#0" expanded="true" />
+                <element signature="e#0#30#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="card_method_obespech.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/card_method_obespech.html">
+      <file leaf-file-name="profile.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/registration/profile.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="urls.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/urls.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="410">
-              <caret line="45" column="91" lean-forward="false" selection-start-line="45" selection-start-column="91" selection-end-line="45" selection-end-column="99" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="forms.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/forms.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="278">
-              <caret line="183" column="91" lean-forward="false" selection-start-line="183" selection-start-column="91" selection-end-line="183" selection-end-column="101" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="431">
-              <caret line="309" column="26" lean-forward="false" selection-start-line="309" selection-start-column="26" selection-end-line="309" selection-end-column="26" />
+            <state relative-caret-position="289">
+              <caret line="35" column="45" lean-forward="false" selection-start-line="35" selection-start-column="45" selection-end-line="35" selection-end-column="45" />
               <folding>
-                <element signature="e#0#28#0" expanded="true" />
+                <element signature="e#2735#2770#0#HTML" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="docxpdf_generator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/docxpdf_generator.py">
+      <file leaf-file-name="scopus_parser.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pubs_parser/scopus_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="22" lean-forward="true" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="35" />
+            <state relative-caret-position="34">
+              <caret line="2" column="33" lean-forward="false" selection-start-line="2" selection-start-column="33" selection-end-line="2" selection-end-column="33" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="generator_core.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/generator_core.py">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pubs_parser/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
-              <caret line="303" column="67" lean-forward="false" selection-start-line="303" selection-start-column="67" selection-end-line="303" selection-end-column="67" />
-              <folding />
+            <state relative-caret-position="250">
+              <caret line="31" column="29" lean-forward="false" selection-start-line="31" selection-start-column="29" selection-end-line="31" selection-end-column="29" />
+              <folding>
+                <element signature="e#0#71#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -131,8 +102,8 @@
       <list>
         <option value="JavaScript File" />
         <option value="CSS File" />
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -156,6 +127,8 @@
       <find>comps</find>
       <find>get_zaf</find>
       <find>required_reconcil</find>
+      <find>get_user_model</find>
+      <find>settings</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -169,7 +142,6 @@
         <option value="$PROJECT_DIR$/static/js/tables/table_samost_hour.js" />
         <option value="$PROJECT_DIR$/static/js/tables/tablesectionshour.js" />
         <option value="$PROJECT_DIR$/utils/view.py" />
-        <option value="$PROJECT_DIR$/umksite/urls.py" />
         <option value="$PROJECT_DIR$/utils/urls.py" />
         <option value="$PROJECT_DIR$/utils/forms.py" />
         <option value="$PROJECT_DIR$/utils/cut2pdf.py" />
@@ -186,24 +158,35 @@
         <option value="$PROJECT_DIR$/core/menu.py" />
         <option value="$PROJECT_DIR$/core/tex_caller.py" />
         <option value="$PROJECT_DIR$/static/doc_templ/kos/template_bilets.tex" />
-        <option value="$PROJECT_DIR$/templates/registration/profile.html" />
         <option value="$PROJECT_DIR$/templates/registration/profile_edit.html" />
         <option value="$PROJECT_DIR$/umksite/__init__.py" />
-        <option value="$PROJECT_DIR$/umksite/settings.py" />
         <option value="$PROJECT_DIR$/core/umk2copy.py" />
         <option value="$PROJECT_DIR$/templates/edit_umk.html" />
         <option value="$PROJECT_DIR$/core/import_plans.py" />
         <option value="$PROJECT_DIR$/core/import_competence.py" />
-        <option value="$PROJECT_DIR$/core/generator_kos.py" />
         <option value="$PROJECT_DIR$/core/core_funcs.py" />
-        <option value="$PROJECT_DIR$/core/generator_core.py" />
-        <option value="$PROJECT_DIR$/core/models.py" />
+        <option value="$PROJECT_DIR$/templates/card_method_obespech.html" />
         <option value="$PROJECT_DIR$/core/urls.py" />
         <option value="$PROJECT_DIR$/templates/global_menu.html" />
-        <option value="$PROJECT_DIR$/core/forms.py" />
+        <option value="$PROJECT_DIR$/core/generator_core.py" />
         <option value="$PROJECT_DIR$/core/docxpdf_generator.py" />
+        <option value="$PROJECT_DIR$/core/generator_kos.py" />
+        <option value="$PROJECT_DIR$/pubs_parser/migrations/__init__.py" />
+        <option value="$PROJECT_DIR$/pubs_parser/apps.py" />
+        <option value="$PROJECT_DIR$/core/apps.py" />
+        <option value="$PROJECT_DIR$/core/models.py" />
         <option value="$PROJECT_DIR$/core/views.py" />
-        <option value="$PROJECT_DIR$/templates/card_method_obespech.html" />
+        <option value="$PROJECT_DIR$/core/forms.py" />
+        <option value="$PROJECT_DIR$/umksite/urls.py" />
+        <option value="$PROJECT_DIR$/umksite/settings.py" />
+        <option value="$PROJECT_DIR$/pubs_parser/models.py" />
+        <option value="$PROJECT_DIR$/pubs_parser/admin.py" />
+        <option value="$PROJECT_DIR$/templates/base.html" />
+        <option value="$PROJECT_DIR$/pubs_parser/urls.py" />
+        <option value="$PROJECT_DIR$/pubs_parser/views.py" />
+        <option value="$PROJECT_DIR$/templates/registration/profile.html" />
+        <option value="$PROJECT_DIR$/pubs_parser/scopus_parser.py" />
+        <option value="$PROJECT_DIR$/pubs_parser/elibrary_parser.py" />
       </list>
     </option>
   </component>
@@ -248,12 +231,39 @@
             <path>
               <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
               <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
+              <item name="pubs_parser" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
+              <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
               <item name="static" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
               <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="css" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
+              <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
+              <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="registration" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
+              <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
               <item name="umksite" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="umkcreator" type="b2602c69:ProjectViewProjectNode" />
+              <item name="umkcreator" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -268,6 +278,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -382,7 +393,21 @@
       <option name="project" value="LOCAL" />
       <updated>1551695186257</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="1) Добавлена возможно создания и редактирования КМО независимо от рабочей программы&#10;2) Дабввлена возможность добавления цифровой подписи в аннотацию для зав. кафедры&#10;30 Внесены исправления в импортирование учебного плана">
+      <created>1555042524890</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1555042524890</updated>
+    </task>
+    <task id="LOCAL-00011" summary="1) Добавлена функция get_user_fio_w_signature формирования списка данных по пользователю &#10;2) В КОСы дабвлена возможность формирования вопросов для коллоквиумов, опроса. собеседования&#10;3) В модель добавлен библиотекарь&#10;4)">
+      <created>1555675884751</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1555675884751</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -400,25 +425,25 @@
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.14301191" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2881907" sideWeight="0.5095314" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32808718" sideWeight="0.49840128" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25135428" sideWeight="0.49520382" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14892772" sideWeight="0.49324325" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="manage.py@umkcreator" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33261105" sideWeight="0.49046862" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32719395" sideWeight="0.49840128" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17768148" sideWeight="0.49520382" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15011914" sideWeight="0.49324325" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="manage.py@umkcreator" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37703142" sideWeight="0.49046862" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25178713" sideWeight="0.5067568" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25178713" sideWeight="0.5067568" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -464,169 +489,19 @@
     <MESSAGE value="1) Добавлена фильтрация в списке рабочих программ&#10;2) Исправлена ошибка копирования данных рабочих программ" />
     <MESSAGE value="1) добавлена модель для Министерства&#10;2) в модель пользователя добавлена должность &quot;председатель СПН&quot;, поле настроек&#10;3) генерирование экзаменационных билетов&#10;4) в форме сохранения профиля пользователя исправлена функция сохранения" />
     <MESSAGE value="1) номер плана для очки/заочки/з-сокр. преобразовано в одно поле" />
-    <option name="LAST_COMMIT_MESSAGE" value="1) номер плана для очки/заочки/з-сокр. преобразовано в одно поле" />
+    <MESSAGE value="1) Добавлена возможно создания и редактирования КМО независимо от рабочей программы&#10;2) Дабввлена возможность добавления цифровой подписи в аннотацию для зав. кафедры&#10;30 Внесены исправления в импортирование учебного плана" />
+    <MESSAGE value="1) Добавлена функция get_user_fio_w_signature формирования списка данных по пользователю &#10;2) В КОСы дабвлена возможность формирования вопросов для коллоквиумов, опроса. собеседования&#10;3) В модель добавлен библиотекарь&#10;4)" />
+    <option name="LAST_COMMIT_MESSAGE" value="1) Добавлена функция get_user_fio_w_signature формирования списка данных по пользователю &#10;2) В КОСы дабвлена возможность формирования вопросов для коллоквиумов, опроса. собеседования&#10;3) В модель добавлен библиотекарь&#10;4)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/system_info.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-310">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/planslist.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1058">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/css/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="19" column="85" lean-forward="true" selection-start-line="19" selection-start-column="85" selection-end-line="19" selection-end-column="85" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/js/jcombobox.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="31" column="10" lean-forward="false" selection-start-line="31" selection-start-column="10" selection-end-line="31" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/css/combobox.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="18" column="20" lean-forward="true" selection-start-line="18" selection-start-column="20" selection-end-line="18" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/news.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="203" lean-forward="false" selection-start-line="8" selection-start-column="203" selection-end-line="8" selection-end-column="203" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/authors.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/js/menu.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../umksite/venv/lib/python3.6/site-packages/tex.py" />
-    <entry file="file:///usr/lib64/python3.6/subprocess.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-153">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/getsysinfo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#43#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/edit_umk_act.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1479">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/edit_umk_rating.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-408">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/kos_menu.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-42">
-          <caret line="4" column="25" lean-forward="true" selection-start-line="4" selection-start-column="25" selection-end-line="4" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="30" column="33" lean-forward="false" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../umksite/venv/lib/python3.6/site-packages/pypandoc/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-27">
-          <caret line="23" column="4" lean-forward="false" selection-start-line="23" selection-start-column="4" selection-end-line="23" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/static/doc_templ/kos/template_bilets.tex">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-513">
-          <caret line="14" column="18" lean-forward="false" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../umksite/venv/lib/python3.6/site-packages/django/views/generic/edit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="242" column="6" lean-forward="false" selection-start-line="242" selection-start-column="6" selection-end-line="242" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../umksite/venv/lib/python3.6/site-packages/django/contrib/auth/decorators.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="39" column="4" lean-forward="false" selection-start-line="39" selection-start-column="4" selection-end-line="39" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../umksite/venv/lib/python3.6/site-packages/django/views/generic/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="14" column="57" lean-forward="false" selection-start-line="14" selection-start-column="57" selection-end-line="14" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/registration/profile_edit.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="22" lean-forward="true" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/registration/profile.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="87" lean-forward="false" selection-start-line="12" selection-start-column="87" selection-end-line="12" selection-end-column="87" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -665,7 +540,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="13" lean-forward="false" selection-start-line="0" selection-start-column="13" selection-end-line="0" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -703,29 +577,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/generator_kos.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="206" column="42" lean-forward="false" selection-start-line="206" selection-start-column="42" selection-end-line="206" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#36#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/edit_umk_actions.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-289">
           <caret line="4" column="24" lean-forward="false" selection-start-line="4" selection-start-column="24" selection-end-line="4" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/edit_umk.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="124" column="13" lean-forward="true" selection-start-line="124" selection-start-column="13" selection-end-line="124" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -733,7 +588,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-901">
           <caret line="45" column="34" lean-forward="true" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -749,7 +603,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1071">
           <caret line="63" column="110" lean-forward="false" selection-start-line="63" selection-start-column="110" selection-end-line="63" selection-end-column="110" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -757,7 +610,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="298">
           <caret line="37" column="23" lean-forward="true" selection-start-line="24" selection-start-column="12" selection-end-line="37" selection-end-column="23" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -769,24 +621,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/generator_core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="303" column="67" lean-forward="false" selection-start-line="303" selection-start-column="67" selection-end-line="303" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="309" column="26" lean-forward="false" selection-start-line="309" selection-start-column="26" selection-end-line="309" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../umksite/venv/lib64/python3.6/tempfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -795,68 +629,282 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/menu.py">
+    <entry file="file://$PROJECT_DIR$/templates/card_method_obespech.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="101">
-          <caret line="24" column="18" lean-forward="false" selection-start-line="24" selection-start-column="18" selection-end-line="24" selection-end-column="18" />
-          <folding />
+        <state relative-caret-position="255">
+          <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/urls.py">
+    <entry file="file://$PROJECT_DIR$/core/menu.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="410">
-          <caret line="45" column="91" lean-forward="false" selection-start-line="45" selection-start-column="91" selection-end-line="45" selection-end-column="99" />
-          <folding />
+        <state relative-caret-position="195">
+          <caret line="24" column="18" lean-forward="false" selection-start-line="24" selection-start-column="18" selection-end-line="24" selection-end-column="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/global_menu.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="63" lean-forward="false" selection-start-line="11" selection-start-column="63" selection-end-line="11" selection-end-column="63" />
+        <state relative-caret-position="544">
+          <caret line="47" column="83" lean-forward="false" selection-start-line="47" selection-start-column="83" selection-end-line="47" selection-end-column="83" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/forms.py">
+    <entry file="file://$PROJECT_DIR$/core/generator_kos.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="278">
-          <caret line="183" column="91" lean-forward="false" selection-start-line="183" selection-start-column="91" selection-end-line="183" selection-end-column="101" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/card_method_obespech.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/umksite/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1991">
-          <caret line="133" column="1" lean-forward="false" selection-start-line="133" selection-start-column="1" selection-end-line="133" selection-end-column="1" />
+        <state relative-caret-position="351">
+          <caret line="62" column="32" lean-forward="false" selection-start-line="62" selection-start-column="32" selection-end-line="62" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/core/docxpdf_generator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="22" lean-forward="true" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="35" />
+        <state relative-caret-position="723">
+          <caret line="300" column="0" lean-forward="false" selection-start-line="300" selection-start-column="0" selection-end-line="300" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#35#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/generator_core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="723">
+          <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/manage.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/migrations/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/migrations/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/apps.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="42" lean-forward="false" selection-start-line="5" selection-start-column="42" selection-end-line="5" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/apps.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="41" lean-forward="false" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/registration/profile_edit.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="22" lean-forward="false" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/umksite/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="324" column="34" lean-forward="true" selection-start-line="324" selection-start-column="34" selection-end-line="324" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/umksite/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="461">
+          <caret line="185" column="14" lean-forward="false" selection-start-line="185" selection-start-column="14" selection-end-line="185" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="11" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="50" lean-forward="false" selection-start-line="9" selection-start-column="50" selection-end-line="9" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#32#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/css/menu.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="118" column="50" lean-forward="false" selection-start-line="118" selection-start-column="50" selection-end-line="118" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/menu.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="87" lean-forward="true" selection-start-line="7" selection-start-column="87" selection-end-line="7" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/edit_umk.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2108">
+          <caret line="124" column="13" lean-forward="true" selection-start-line="124" selection-start-column="13" selection-end-line="124" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/css/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="75" lean-forward="true" selection-start-line="14" selection-start-column="75" selection-end-line="14" selection-end-column="82" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="12" column="27" lean-forward="true" selection-start-line="12" selection-start-column="27" selection-end-line="12" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../umksite/venv/lib/python3.6/site-packages/selenium/webdriver/remote/webdriver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-30">
+          <caret line="300" column="8" lean-forward="false" selection-start-line="300" selection-start-column="8" selection-end-line="300" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="250">
+          <caret line="31" column="29" lean-forward="false" selection-start-line="31" selection-start-column="29" selection-end-line="31" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#71#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/scopus_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="33" lean-forward="false" selection-start-line="2" selection-start-column="33" selection-end-line="2" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="14" lean-forward="false" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/core/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="398" column="23" lean-forward="false" selection-start-line="398" selection-start-column="23" selection-end-line="398" selection-end-column="23" />
+        <state relative-caret-position="85">
+          <caret line="5" column="44" lean-forward="true" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="11" lean-forward="false" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="11" />
           <folding>
-            <element signature="e#0#90#0" expanded="true" />
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1562">
+          <caret line="445" column="16" lean-forward="false" selection-start-line="445" selection-start-column="5" selection-end-line="445" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/registration/profile.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="35" column="45" lean-forward="false" selection-start-line="35" selection-start-column="45" selection-end-line="35" selection-end-column="45" />
+          <folding>
+            <element signature="e#2735#2770#0#HTML" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubs_parser/elibrary_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2448">
+          <caret line="11" column="41" lean-forward="true" selection-start-line="11" selection-start-column="41" selection-end-line="11" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>

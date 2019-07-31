@@ -295,15 +295,21 @@ class UserFormEdit(forms.ModelForm):
             Row(Div('first_name',css_class="col-md-2"), Div('last_name',css_class="col-md-2"),Div('patronymic',css_class="col-md-2"),Div('birthday', css_class="col-md-2")),
             Row(Div('deparmt', css_class="col-md-2"),  Div('position', css_class="col-md-2"),Div('science_stepen', css_class="col-md-2"), Div('science_zvanie', css_class="col-md-2")),
             Row(Div('electronic_signature', css_class="col-md-3"),Div('email', css_class="col-md-3"),Div('sets', css_class="col-md-3")),
+            Row(Div('scopus_id', css_class="col-md-3"), Div('elibrary_id', css_class="col-md-3")),
             FormActions(Submit('save', u'Сохранить', css_class="btn-primary", css_id='btn_save'),
                         Submit('cancel', u'Назад'))
         )
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name','last_name','patronymic','birthday','deparmt','position','science_stepen','science_zvanie','electronic_signature', 'email', 'sets']
+        fields = ['first_name','last_name','patronymic','birthday','deparmt',
+                  'position','science_stepen','science_zvanie',
+                  'electronic_signature', 'email',
+                  'sets', 'scopus_id', 'elibrary_id' ]
 
-    def save(self,first_name, last_name, patronymic, birthday, deparmt, position, science_stepen, science_zvanie, electronic_signature, email, sets):
+    def save(self,first_name, last_name, patronymic, birthday, deparmt, position,
+             science_stepen, science_zvanie, electronic_signature, email, sets,
+             scopus_id, elibrary_id):
         user = super(UserFormEdit, self).save(commit=False)
         user.first_name = first_name
         user.last_name = last_name
@@ -316,5 +322,7 @@ class UserFormEdit(forms.ModelForm):
         user.electronic_signature = electronic_signature
         user.email = email
         user.sets = sets
+        user.scopus_id = scopus_id
+        user.elibrary_id = elibrary_id
         user.save()
         return user
