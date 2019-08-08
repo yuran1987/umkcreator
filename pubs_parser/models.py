@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.conf import settings
 
 
@@ -16,7 +15,8 @@ class Publications(models.Model):
 
     elib_id = models.CharField(null=True, blank=True, max_length=255, verbose_name="eLibrary ID")
     doi = models.CharField(null=True, blank=True, max_length=255, verbose_name="DOI")
-    cites = models.CharField(null=True, blank=True, max_length=255, verbose_name="Цитируется")
+    cites = models.CharField(null=True, blank=True, max_length=255, verbose_name="Цитируется, кол-во раз")
+    isScopusWoS = models.BooleanField(default=False, verbose_name="Входит в базу цитирований Scopus или WoS")
 
     class Meta:
         verbose_name = u'Публикация'

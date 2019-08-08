@@ -51,7 +51,7 @@ class Elsevier(object):
             #           'cites': int(coredata['citedby-count'])
             #         }
             edition_info.update({'name': coredata['prism:publicationName']})
-            edition_info.update({'volume': coredata['prism:volume']})
+            edition_info.update({'volume': coredata.get('prism:volume')})
             edition_info.update({'number': coredata.get('prism:issueIdentifier')})
             edition_info.update({'pages': coredata.get('prism:pageRange')})
             edition_info.update({'type': coredata.get('subtypeDescription')})
@@ -74,17 +74,25 @@ class Elsevier(object):
 
     def add_pubs_in_database(self, creator):
         count = 0
+        count_upd = 0
         for item in self.articles:
             res = self.get_article_info(article_url=item['url'])
-            c = Publications.objects.filter(title=res['title']).exists()
-            print(c)
-            if not c:
-                pub = Publications(creator=creator, authors = res['authors'], title=res['title'].capitalize(), year=res['year'] if res['year']>1920 else timezone.now().year, edition_info = res['edition_info'],
-                               doi = res['doi'], cites = res['cites'])
-                pub.save()
+            pubs = Publications.objects.filter(title=res['title'])
+            if pubs.exists() is False:
+                p = Publications(creator=creator, authors = res['authors'], title=res['title'].capitalize(),
+                                   year=res['year'] if res['year']>1920 else timezone.now().year,
+                                   edition_info = res['edition_info'],
+                                   doi = res['doi'], cites = res['cites'], isScopusWoS = True)
+                p.save()
                 count+=1
-        print("Распознано публикаций: ",count)
-
+            else:
+                for p in pubs:
+                    p.isScopusWoS=True
+                    p.doi = res['doi']
+                    p.cites = res['cites']
+                    p.save()
+                    count_upd += 1
+        print("Распознано публикаций: ",count,'  Обновлено публикаций: ', count_upd)
 #**************************************************************************
 #
 #

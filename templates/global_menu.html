@@ -15,6 +15,14 @@
                 <li><a href="#"><img src="{% static 'img/2.png' %}">Утилиты</a>
                     <ul>
                         <li><a href="{% url 'convert2pdf'  %}">Вырезать/вклеить</a></li>
+                        <li><a href="#">Публикации</a>
+                            <ul>
+                                <li><a href="{% url 'import_publications'  type='elibrary' %}">Обновить публикации из базы Elibrary</a></li>
+                                <li><a href="{% url 'import_publications'  type='scopus' %}">Обновить публикации из базы Scopus</a></li>
+                                <li><a href="{% url 'get_publications_docx' type='5year' %}">Сформировать список публикаций за последние 5 лет</a></li>
+                                <li><a href="{% url 'get_publications_docx' type='allyear' %}">Сформировать список всех публикаций</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 {% if user.is_superuser %}

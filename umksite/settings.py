@@ -181,6 +181,4 @@ TINYMCE_COMPRESSOR = True
 #    for pubs_parser
 #--------------------------------
 GECKODRIVER_PATH = "/home/yuriy/tmp/geckodriver"
-ELIBRARY_LOGIN = "yuran1987"
-ELIBRARY_PASSWORD= "shtanovyuriy1987"
 SCOPUS_API_KEY = "2a9f701533b07ca761bdd45c4039c2db"

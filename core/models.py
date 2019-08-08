@@ -443,7 +443,7 @@ class User(AbstractUser):
      electronic_signature = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name=u'Электронная подпись')
      sets = models.CharField(blank = True, null=True, max_length=255, verbose_name="Настройки")
      scopus_id = models.CharField(blank = True, null=True, max_length=255, verbose_name="Scopus ID")
-     elibrary_id = models.CharField(blank = True, null=True, max_length=255, verbose_name="Elibrary ID", help_text="authorid from url")
+     elibrary_id = models.CharField(blank = True, null=True, max_length=255, verbose_name="Elibrary ID", help_text="authorid from url; user; password")
 
      def get_patronymic(self):
         return self.patronymic
@@ -464,7 +464,7 @@ class User(AbstractUser):
          return self.get_position_display()
 
      def get_fullname(self):
-         return "{0} {1}. {2}.".format(self.last_name, self.first_name[0], self.patronymic[0])
+         return "{0} {1}.{2}.".format(self.last_name, self.first_name[0], self.patronymic[0])
 
 
      get_patronymic.short_description = u'Отчество'

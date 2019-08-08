@@ -1,22 +1,34 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import re
+import re, time
 from django.utils import timezone
 from .models import Publications
 
 
 class Elibrary(object):
 
-    def __init__(self, authorid, login, password, geckodriver_path):
+    def __init__(self, authorid, login, password, geckodriver_path, use_proxy=False):
         # Указываем полный путь к geckodriver.exe на вашем ПК.
         opts = webdriver.FirefoxOptions()
         opts.add_argument('-headless')
         assert opts.headless #no gui
-        self.browser = webdriver.Firefox(executable_path=geckodriver_path, options=opts)
         self.elibrary_url = "https://elibrary.ru"
         self.authorid = str(authorid)
         self.articles_links = []
         self.articles = []
+
+        if use_proxy:
+            print('Запуск браузера с прокси')
+            profile = webdriver.FirefoxProfile()
+            profile.set_preference("network.proxy.type", 1)
+            profile.set_preference("network.proxy.socks", "127.0.0.1")#получение прокси IP:порт через TOR для обхода блокировки Elibrary
+            profile.set_preference("network.proxy.socks_port", 9050)
+            profile.update_preferences()
+            self.browser = webdriver.Firefox(executable_path=geckodriver_path, options=opts, firefox_profile=profile)
+            time.sleep(5)
+            self.get_my_ip_address()
+        else:
+            self.browser = webdriver.Firefox(executable_path=geckodriver_path, options=opts)
 
         if login and password:
             self.browser.get(self.elibrary_url)
@@ -30,22 +42,30 @@ class Elibrary(object):
     def __del__(self):
         self.browser.close()
 
+    def get_my_ip_address(self):
+        html = self.get_html('https://2ip.ru/')
+        time.sleep(15)
+        soup = BeautifulSoup(html, 'html.parser')
+
+        div = soup.find('div',attrs={'class': 'ip'})
+        print('my IP: ',self.remove_htmk_tags(div.find('big', attrs={'id':'d_clip_button'})))
+
 
     def remove_htmk_tags(self, val):
         res = "{0}".format(re.compile(r'<.*?>').sub('', str(val)))
         res = res.replace('\xa0'," ")
         return res.replace('\n', "")
 
-
     def get_html(self, url):
         self.browser.get(url)
+        time.sleep(60)
         html = self.browser.page_source
         return html
 
     def get_pages_count(self, parser):
         tr_pages = parser.find('tr', {'align': 'center', 'valign': 'middle', 'class': 'menurb'})
         pages = 1
-        if tr_pages == 'None':
+        if tr_pages is not 'None':
             list_js = []
             for url in tr_pages.find_all('a'):
                 tmp = url.get('href')
@@ -68,6 +88,8 @@ class Elibrary(object):
                     a_url = td.find('a').get('href')
                     if re.search("item.asp", a_url):
                         self.articles_links.append(a_url)
+                    else:
+                        print("Ошибочная ссылка: ",a_url)
                     span = tr.find('span', {'class': "menug"}) #Версии:
                     if span is not None:
                         url_tmp = str(span.find('a').get('href'))
@@ -92,6 +114,7 @@ class Elibrary(object):
         self.articles = []
         for artcl in self.articles_links:
             edition_info = {}
+            authors = []
             doi = None
             annotation = None
             parser = BeautifulSoup(self.get_html(self.elibrary_url + artcl), 'html.parser')
@@ -111,7 +134,6 @@ class Elibrary(object):
                 tmp = tbl.find('td',{'width':'514', 'valign':'middle','align':'center'})
                 if tmp:#авторы
                     tmp = tmp.find_all('b')
-                    authors = []
                     for auth in tmp:
                         t = self.remove_htmk_tags(auth).title()
                         if re.search("\.",t) is None:
@@ -162,7 +184,7 @@ class Elibrary(object):
                     elif re.findall('ЖУРНАЛ:', str(tmp)):#Инфо про журнал
                         tmp = tbl.find('td', {'width': '504', 'align': 'left', 'valign': 'middle'})
                         items = str(tmp).split('<br/>')
-                        print(items)
+
                         eISSN_item=''
                         ISSN_item = ''
                         for it in items:
@@ -206,8 +228,8 @@ class Elibrary(object):
                             edition_info.update({'lang': self.remove_htmk_tags(d).replace('Язык: ', '')})
                         elif re.findall('ISBN:', d):
                             edition_info.update({'isbn': self.remove_htmk_tags(d).replace('ISBN: ', '')})
-                        elif re.search(r'Год\sиздания:|Год:', d):
-                            year = int(self.remove_htmk_tags(d).replace('Год издания: ', '').replace('Год:', ''))
+                        elif re.search(r'Год\sиздания:|Год:|Год\sпубликации:', d):
+                            year = int(self.remove_htmk_tags(d).replace('Год издания: ', '').replace('Год:', '').replace('Год публикации:',''))
                         elif re.findall('Место издания:', d):
                             edition_info.update({'place': self.remove_htmk_tags(d).replace('Место издания: ', '')})
                         elif re.search(r'Число\sстраниц:|Страницы:', d):
@@ -220,8 +242,13 @@ class Elibrary(object):
                             edition_info.update({'number': self.remove_htmk_tags(d).replace('Номер: ', '')})
                         elif re.findall('Том:', d): #том журнала
                             edition_info.update({'volume': self.remove_htmk_tags(d).replace('Том: ', '')})
+                        elif re.findall('Номер патента:',d):
+                            edition_info.update({'Номер патента': self.remove_htmk_tags(d).replace('Номер патента: ', '')})
+                        elif re.findall('Страна:',d):
+                            edition_info.update({'Страна': self.remove_htmk_tags(d).replace('Страна: ', '')})
 
             self.articles.append({'elibrary_id': eLIBRARY_ID, 'doi': doi, 'authors': ", ".join(authors), 'title': title.capitalize(), 'year': year, 'annotation': annotation, 'edition_info': edition_info, 'biblio_indicators': biblio_pokazatel})
+
 
     def get_articles(self):#Получение списка публикаций
         return self.articles
@@ -232,10 +259,30 @@ class Elibrary(object):
         for item in self.articles:
             c = Publications.objects.filter(title=item['title']).exists()
             if not c:
+                if 'Входит в Scopus' in item['biblio_indicators'].keys():
+                    if re.search('да', str(item['biblio_indicators']['Входит в Scopus']).strip()):
+                        isScopusWoS = True
+                elif 'Входит в Web of Science' in item['biblio_indicators'].keys():
+                    if re.search('да',str(item['biblio_indicators']['Входит в Web of Science']).strip()):
+                        isScopusWoS = True
+                else:
+                    isScopusWoS = False;
+
+                cites = []
+                if 'Цитирований в РИНЦ' in item['biblio_indicators'].keys():
+                    cites.append(str(item['biblio_indicators']['Цитирований в РИНЦ']).strip())
+
+                if 'Цитирований в Scopus' in item['biblio_indicators'].keys():
+                    cites.append(str(item['biblio_indicators']['Цитирований в Scopus']).strip())
+
+                if 'Цитирований в Web of Science' in item['biblio_indicators'].keys():
+                    cites.append(str(item['biblio_indicators']['Цитирований в Web of Science']).strip())
+
                 pub = Publications(creator=creator, authors = item['authors'], title=item['title'],
                                    year=item['year'] if item['year']>1920 else timezone.now().year, edition_info = item['edition_info'],
                                    doi = item['doi'], biblio_pokazatel = item['biblio_indicators'],
-                                   annotation = item['annotation'], elib_id = item['elibrary_id'])
+                                   annotation = item['annotation'], elib_id = item['elibrary_id'], isScopusWoS = isScopusWoS,
+                                   cites=max(cites))
                 pub.save()
                 count+=1
         print("Распознано публикаций: ",count)

@@ -3,8 +3,8 @@ from .models import Publications
 
 
 class PublicationsAdmin(admin.ModelAdmin):
-    list_display = ('authors', 'title','year',  'doi', 'cites')
-    list_filter = ['year']
+    list_display = ('creator','authors', 'title','year', 'doi', 'cites', 'isScopusWoS')
+    list_filter = ['year','creator']
 
 
 admin.site.register(Publications,PublicationsAdmin)

@@ -7,17 +7,22 @@
             padding-top: 220px;
         }
         #panel {columns: 3 20em}
+        canvasjs-chart-toolbar {
+  display: none;
+}
     </style>
 {% endblock %}
 {% block content %}
     <script>
         window.onload = function() {
-            var dataPoints = [];
+            var dataPointsOther = [];
+            var dataPointsScopusWoS = [];
+            var dataPointsPatents = [];
 
             var chart = new CanvasJS.Chart("chartContainer", {
                 animationEnabled: true,
-                //theme: "dark2", // "light1", "light2", "dark1", "dark2"
                 backgroundColor: "#79C2D1",
+                exportEnabled: true,
                 title: {
                     text: "Публикации"
                 },
@@ -28,22 +33,59 @@
                 },
                 axisX: {
                     title: "Год",
+                    //interval: 1,
+                    intervalType: "year",
                     valueFormatString: "####"
                 },
+                toolTip: {
+                    shared: true,
+                },
                 data: [{
-                    type: "column",
-                    xValueFormatString: "####",
+                    type: "stackedColumn",
+                    name: "РИНЦ",
+                    showInLegend: true,
+                    xValueFormatString: "за #### год опубликовано:",
                     yValueFormatString: "####",
-                    dataPoints: dataPoints
+                    dataPoints: dataPointsOther
+                },
+                {
+                    type: "stackedColumn",
+                    name: "Scopus, WoS",
+                    showInLegend: true,
+                    xValueFormatString: "за #### год опубликовано:",
+                    yValueFormatString: "####",
+                    dataPoints: dataPointsScopusWoS
+                },
+                {
+                    type: "stackedColumn",
+                    name: "Патенты",
+                    showInLegend: true,
+                    xValueFormatString: "за #### год опубликовано:",
+                    yValueFormatString: "####",
+                    dataPoints: dataPointsPatents
                 }]
             });
 
             function addData(data) {
                 for (var i = 0; i < data.length; i++) {
-                    dataPoints.push({
-                        x: data[i].year,
-                        y: data[i].count
-                    });
+                    if(data[i].rinc>0) {
+                        dataPointsOther.push({
+                            x: data[i].year,
+                            y: data[i].rinc
+                        });
+                    }
+                    if(data[i].scopus>0) {
+                        dataPointsScopusWoS.push({
+                            x: data[i].year,
+                            y: data[i].scopus
+                        });
+                    }
+                    if(data[i].patents>0) {
+                        dataPointsPatents.push({
+                            x: data[i].year,
+                            y: data[i].patents
+                        });
+                    }
                 }
                 chart.render();
             }
